@@ -1,6 +1,6 @@
 ---
 name: doubao-vision
-description: 视觉模型调用工具集 — 整合火山引擎豆包 + 阿里云千问，支持 Claude MCP
+description: 视觉模型调用工具集 — 整合火山引擎豆包 + 阿里云千问，支持 MCP 协议
 ---
 ## 工具文件
 

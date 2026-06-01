@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Vision Pro v3 — 统一视觉模型调用工具
+ * DeepSeek Vision — 统一视觉识别工具
  *
- * 整合火山引擎 ARK（豆包 50万 token）和阿里云百炼 DashScope（千问 免费额度）
+ * 整合火山引擎 ARK（豆包）和阿里云百炼 DashScope（千问）
  * 智能选择最优模型，在准确性和 token 消耗之间自动平衡
  *
- * v3 更新（2026/05）:
+ * 基于 28 张合成图 + 10 张真实照片的交叉测试优化:
  *   - 新增 16 个免费千问视觉模型（含 7 个 OCR 专用模型）
  *   - OCR 模式改用专用模型 qwen-vl-ocr-latest
  *   - quality 模式加入 qwen-vl-max

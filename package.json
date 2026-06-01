@@ -12,13 +12,12 @@
   "keywords": [
     "vision",
     "deepseek",
-    "reasonix",
     "doubao",
     "qwen",
-    "mcp",
-    "claude",
     "image-recognition",
-    "anime-recognition"
+    "mcp",
+    "anime-recognition",
+    "ocr"
   ],
   "license": "MIT",
   "engines": {

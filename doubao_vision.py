@@ -2,8 +2,8 @@
 豆包视觉模型调用脚本
 用法: python doubao_vision.py <图片路径> [问题] [模型ID]
 
-默认模型: doubao-seed-1-6-vision-250815 (最快最便宜)
-其他模型: doubao-1-5-vision-pro-32k-250115, doubao-seed-1-6-251015, doubao-seed-1-6-flash-250828
+默认模型: doubao-seed-1-6-vision-250815 (最强视觉)
+其他模型: doubao-seed-1-6-flash-250615 (均衡首选), doubao-1-5-vision-pro-32k-250115 (最省token)
 """
 import base64, json, urllib.request, urllib.error, sys, os
 
