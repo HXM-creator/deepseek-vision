@@ -67,6 +67,67 @@ reasonix-vision/
     └── README.md                 # Real photo test results
 ```
 
+## 🎬 Live Demo
+
+> All outputs below are **real results** from actual runs
+
+### 🎌 Demo 1: Anime Character ID (Doubao)
+
+```bash
+node vision.js anime.jpg "Who is this?" --provider ark
+```
+
+```
+🔥 Volcengine ARK | doubao-seed-1-6-flash-250615
+📝 Mode: auto→balanced | 488KB
+──────────────────────────────────────────────────
+📋 Answer:
+
+This is Shido Itsuka from Date A Live.
+──────────────────────────────────────────────────
+📊 Token: 672  ⏱️  Time: 1.6s
+```
+
+> 💡 The same image was tested 3 times with Qwen — all wrong. **For anime, use Doubao.**
+
+### 📈 Demo 2: Engineering Chart (Qwen)
+
+```bash
+node vision.js bode_plot.png "What is this?" --free --mode fast
+```
+
+```
+💎 Alibaba DashScope | qwen-vl-plus
+📝 Mode: fast | 8KB
+──────────────────────────────────────────────────
+📋 Answer:
+
+This is a Bode plot of a low-pass filter.
+Cutoff frequency fc = 10 Hz, roll-off -20 dB/decade...
+──────────────────────────────────────────────────
+📊 Token: 941  ⏱️  Time: 6.7s
+```
+
+### ⚡ Demo 3: Quick Scene Understanding (Doubao Turbo)
+
+```bash
+node vision.js scene.png "Describe in one sentence" --provider ark --mode fast
+```
+
+```
+🔥 Volcengine ARK | doubao-1-5-vision-pro-32k-250115
+📝 Mode: fast | 4KB
+──────────────────────────────────────────────────
+📋 Answer:
+
+A simple cartoon showing a red-roofed brown house, a green tree,
+blue sky with white clouds, and a sun over green grass.
+──────────────────────────────────────────────────
+📊 Token: 268  ⏱️  Time: 1.5s
+```
+
+---
+
 ## 🚀 Quick Start
 
 ### 1️⃣ Prerequisites
