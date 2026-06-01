@@ -23,6 +23,9 @@ benchmark_real/*.png
 .vscode/
 .idea/
 
+# 个人 skill（不进仓库，仅供本地 Reasonix 使用）
+.reasonix/skills/git-push.md
+
 # 工作区无关文件（源自 Reasonix 环境）
 *.exe
 *.slx
