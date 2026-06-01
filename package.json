@@ -1,7 +1,7 @@
 {
   "name": "deepseek-vision",
   "version": "1.0.0",
-  "description": "Give your DeepSeek eyes 👁️ — Vision toolkit with Doubao + Qwen support",
+  "description": "Give your DeepSeek eyes 👁️ — Vision toolkit with cross-platform verification (Doubao + Qwen)",
   "main": "vision.js",
   "scripts": {
     "analyze": "node vision.js",

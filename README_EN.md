@@ -13,7 +13,7 @@
 
 <p align="center">
   <b>Give Your DeepSeek Eyes</b><br>
-  <i>Vision toolkit with Doubao + Qwen dual-platform support</i>
+  <i>Vision toolkit with cross-platform verification &mdash; catch AI hallucinations before they fool you</i>
 </p>
 
 <p align="center">
@@ -37,6 +37,7 @@
 | 🔬 **Engineering Diagrams** | Chip layouts, circuit schematics, Bode plots, PCB layouts |
 | 🌄 **Scene Understanding** | Detailed image descriptions, object/color/expression detection |
 | 📊 **Chart Extraction** | Bar chart data, curve trends, logic gate analysis |
+| 🔄 **Cross-Platform Verification** | Auto-compares Doubao vs Qwen results, flags discrepancies — prevents AI hallucination |
 | ⚡ **Turbo Mode** | Doubao fast averages <2s per image |
 | 🔄 **Dual-Platform Failover** | One fails, the other auto-takes over |
 | 💰 **Fully Free** | Both platforms offer generous free tiers |
