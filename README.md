@@ -227,7 +227,7 @@ node vision.js photo.jpg "这是谁？" --no-verify
 ## 🔧 Reasonix Skill 集成
 
 ```
-/run_skill doubao-vision --arguments "识别这张图片"
+/run_skill deepseek-vision --arguments "识别这张图片"
 ```
 
 ## 🔑 关于 API Key

@@ -1,5 +1,5 @@
 ---
-name: doubao-vision
+name: deepseek-vision
 description: 视觉识别工具 — 双平台(豆包+千问) + 双重验证 + 场景预设
 ---
 ## 工具文件
