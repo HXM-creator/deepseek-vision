@@ -48,7 +48,7 @@
 deepseek-vision/
 │
 ├── 🏆 vision.js                  # Main vision script (Node.js, dual-platform)
-├── 🐍 doubao_vision.py           # Backup script (Python, Doubao only)
+├── 🐍 doubao_vision.py           # [Deprecated] Backup script (Python → use vision.js)
 │
 ├── 🔑 .env.example               # API key template
 ├── 📄 LICENSE                    # MIT License
@@ -212,6 +212,21 @@ node vision.js photo.jpg "Who is this?" --provider ark --verify
 ## 🔍 Fact-Checking `--verify`
 
 Vision models are great at **seeing** but not at **remembering** (e.g., they can identify aespa but might get member names wrong). `--verify` mode sends the vision output to a **text model** for fact-checking, correcting names, places, titles, and values.
+
+### Auto-Trigger
+
+When asking "Who is this?" or "What character?", **`--verify` auto-enables**. Use `--no-verify` to skip:
+
+```bash
+# Auto-verify: triggered by "who/what" questions
+node vision.js anime.jpg "Who is this?" --provider ark
+
+# Manual skip
+node vision.js anime.jpg "Who is this?" --provider ark --no-verify
+
+# Manual enable (auto-trigger already does this, but explicit is fine)
+node vision.js anime.jpg "Who is this?" --provider ark --verify
+```
 
 ### Cost
 

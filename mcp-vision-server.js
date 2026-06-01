@@ -78,6 +78,11 @@ const TOOLS = [
           description: "Analysis mode: 'auto' (smart select), 'fast' (quick), 'balanced', 'quality' (high quality), 'thinking' (deep reasoning), 'ocr' (text extraction)",
           default: "auto"
         },
+        verify: {
+          type: "boolean",
+          description: "Enable text fact-checking after vision analysis (auto-enabled for 'who/what' questions)",
+          default: false
+        },
         free_first: {
           type: "boolean",
           description: "Prefer free-tier Qwen models when possible",
@@ -111,7 +116,7 @@ function handleToolCall(id, name, args) {
 }
 
 async function handleVisionAnalyze(id, args) {
-  const { image_path, question, provider, mode, free_first } = args;
+  const { image_path, question, provider, mode, free_first, verify } = args;
 
   // Validate image path
   const imgPath = path.resolve(image_path);
@@ -125,6 +130,7 @@ async function handleVisionAnalyze(id, args) {
   if (provider && provider !== "auto") cmd += ` --provider ${provider}`;
   if (mode && mode !== "auto") cmd += ` --mode ${mode}`;
   if (free_first) cmd += " --free";
+  if (verify) cmd += " --verify";
   cmd += " --json";
 
   try {

@@ -28,7 +28,8 @@
  *   --budget           显示剩余 token 预算
  *   --max-tokens <n>   最大生成长度
  *   --free             优先使用免费额度模型
- *   --verify           双平台交叉验证，自动比对豆包与千问结果的一致性
+ *   --verify           事实核查：视觉识别后自动用文本模型核对事实
+ *   --no-verify        跳过自动验证（默认问"这是谁"时自动开启）
  *
  * 示例:
  *   node vision.js photo.jpg                    # auto 模式，智能选择
@@ -36,7 +37,8 @@
  *   node vision.js photo.jpg --mode quality     # 强制高质量
  *   node vision.js photo.jpg --mode ocr         # 文字提取（新版用专用OCR模型）
  *   node vision.js photo.jpg --free             # 优先使用免费额度
- *   node vision.js photo.jpg --verify           # 识别 + 双平台交叉验证
+ *   node vision.js photo.jpg --verify           # 识别 + 文本事实核查
+ *   node vision.js photo.jpg --no-verify        # 跳过自动验证
  *   node vision.js --list                        # 查看所有模型
  *   node vision.js --budget                      # 查看剩余预算
  */
@@ -227,11 +229,18 @@ function parseArgs() {
       case "--budget": opts.showBudget = true; break;
       case "--free": opts.freeFirst = true; break;
       case "--verify": opts.verify = true; break;
+      case "--no-verify": opts.noVerify = true; break;
       default:
         if (!args[i].startsWith("--")) {
           if (!opts.imagePath) opts.imagePath = args[i];
           else if (!opts.prompt) opts.prompt = args[i];
         }
+    }
+  }
+  // 自动验证：问"是谁/什么角色"等精确命名问题时自动启用 --verify
+  if (!opts.noVerify && !opts.verify && opts.prompt) {
+    if (NEEDS_PRECISE_NAMING.test(opts.prompt) || IS_TABLE_DOC.test(opts.prompt)) {
+      opts.verify = true;
     }
   }
   return opts;

@@ -48,7 +48,7 @@
 deepseek-vision/
 │
 ├── 🏆 vision.js                  # 主力视觉脚本（Node.js，双平台）
-├── 🐍 doubao_vision.py           # 备用脚本（Python，仅豆包）
+├── 🐍 doubao_vision.py           # [已弃用] 备用脚本（Python，仅豆包→ 推荐 vision.js）
 │
 ├── 🔑 .env.example               # API Key 配置模板
 ├── 📄 LICENSE                    # MIT 许可证
@@ -211,6 +211,21 @@ node vision.js photo.jpg "这是谁？" --provider ark --verify
 ## 🔍 事实核查 `--verify`
 
 视觉模型擅长**看**但不擅长**记**（比如认出 aespa 但可能叫错成员名字）。`--verify` 模式在视觉识别后，自动将识别结果发给**文本模型**进行事实核查，纠正人名/地名/作品名/参数等错误。
+
+### 自动触发
+
+问"这是谁？""什么角色？""什么建筑？"等问题时，**`--verify` 默认自动开启**。如果不需要验证，加 `--no-verify` 跳过：
+
+```bash
+# 自动验证：问"谁/什么角色"时自动开启
+node vision.js anime.jpg "这是谁？" --provider ark
+
+# 手动跳过验证
+node vision.js anime.jpg "这是谁？" --provider ark --no-verify
+
+# 手动开启（虽然会自动开，但显式写也行）
+node vision.js anime.jpg "这是谁？" --provider ark --verify
+```
 
 ### 开销
 
