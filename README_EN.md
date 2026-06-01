@@ -165,6 +165,36 @@ You > exit
 
 ---
 
+## 📊 Usage Tracking
+
+Every call auto-logs token usage. Check it anytime:
+
+```bash
+node vision.js --budget
+```
+
+Output:
+
+```
+📊 Usage Stats
+────────────────────────────────────────
+   Total: 1,353 tok
+   Today: 1,353 tok
+   Sessions: 2
+
+💰 Estimated Remaining
+   🔥 Doubao: 498,647 / 500,000 tok
+   💎 Qwen: 998,647 / 1,000,000 tok
+
+📋 Last 5 calls:
+   06-01 |   683 tok | doubao-seed-1-6-flash
+   06-01 |   670 tok | doubao-seed-1-6-flash
+```
+
+Data stored locally in `.vision_budget.json`, never uploaded.
+
+---
+
 ## 🔧 Advanced Usage
 
 | Feature | Command |
