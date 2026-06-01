@@ -13,7 +13,7 @@
 
 <p align="center">
   <b>Give Your DeepSeek Eyes</b><br>
-  <i>Vision toolkit with cross-platform verification &mdash; catch AI hallucinations before they fool you</i>
+  <i>Vision recognition + text fact-checking &mdash; see it, then verify it</i>
 </p>
 
 <p align="center">
@@ -37,7 +37,7 @@
 | 🔬 **Engineering Diagrams** | Chip layouts, circuit schematics, Bode plots, PCB layouts |
 | 🌄 **Scene Understanding** | Detailed image descriptions, object/color/expression detection |
 | 📊 **Chart Extraction** | Bar chart data, curve trends, logic gate analysis |
-| 🔄 **Cross-Platform Verification** | Auto-compares Doubao vs Qwen results, flags discrepancies — prevents AI hallucination |
+| 🧠 **Text Fact-Checking** | Vision output verified by text model — catches wrong names, places, and values |
 | ⚡ **Turbo Mode** | Doubao fast averages <2s per image |
 | 🔄 **Dual-Platform Failover** | One fails, the other auto-takes over |
 | 💰 **Fully Free** | Both platforms offer generous free tiers |
@@ -209,9 +209,9 @@ node vision.js --list
 node vision.js photo.jpg "Who is this?" --provider ark --verify
 ```
 
-## 🔍 Verification Mode `--verify`
+## 🔍 Fact-Checking `--verify`
 
-Use `--verify` when you need precise naming (character names, people, landmarks, values). It automatically calls the opposite platform to cross-check results and flags discrepancies.
+Vision models are great at **seeing** but not at **remembering** (e.g., they can identify aespa but might get member names wrong). `--verify` mode sends the vision output to a **text model** for fact-checking, correcting names, places, titles, and values.
 
 ### Cost
 
@@ -224,25 +224,25 @@ Use `--verify` when you need precise naming (character names, people, landmarks,
 
 ```bash
 # Without verify (fast)
-node vision.js anime.jpg "Who is this?" --provider ark
-→ Doubao: "Shido Itsuka" (1.5s, 680 tok)
+node vision.js aespa.jpg "Who are they?" --provider ark
+→ Doubao: "Karina, Giselle, Winter, NingNing" (1.7s, 928 tok)
 
-# With verify (more reliable)
-node vision.js anime.jpg "Who is this?" --provider ark --verify
-→ Doubao: "Shido Itsuka" (1.5s, 680 tok)
-→ Qwen verify: "Common anime girl, can't identify" ⚠️ Discrepancy
-→ Conclusion: Doubao is correct (confirmed by user)
+# With verify (text model fact-checks)
+node vision.js aespa.jpg "Who are they?" --provider ark --verify
+→ Doubao: "Karina, Giselle, Winter, NingNing"
+→ Text check: ⚠️ "NingNing" should be "Ningning" (lowercase n)
+→ Conclusion: Group correct, member name capitalization fixed
 ```
 
 JSON mode outputs a `verification` field:
 ```json
 {
   "verification": {
-    "status": "confirmed" | "discrepancy",
-    "agreement_ratio": 0.0~1.0,
-    "secondary_model": "qwen-vl-plus",
-    "primary_only_entities": ["..."],
-    "secondary_only_entities": ["..."]
+    "method": "text-model-factcheck",
+    "model": "qwen3-vl-plus",
+    "provider": "dashscope",
+    "has_corrections": false,
+    "report": "Fact check passed, no errors found"
   }
 }
 ```

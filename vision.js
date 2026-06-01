@@ -467,58 +467,51 @@ async function main() {
   const timing = (Date.now() - startTime) / 1000;
   const primaryResult = formatResult(data, modelName, provider, timing, selectedMode);
 
-  // ===== --verify: 双平台交叉验证 =====
+  // ===== --verify: 文本模型事实核查 =====
   if (opts.verify) {
-    const verifyStart = Date.now();
+    const visionText = primaryResult.content || "";
     const verifyProv = provider === "ark" ? "dashscope" : "ark";
-    const verifyModels = Object.entries(MODELS).filter(([_, i]) => i.provider === verifyProv);
-    const verifyModel = verifyModels.find(([n]) => n.includes("flash") || n.includes("plus"))?.[0]
-      || verifyModels[0]?.[0];
+    const verifyConfig = CONFIG[verifyProv];
 
-    if (verifyModel) {
+    // 可用的文本模型（用于验证，不需要视觉能力）
+    const TEXT_MODELS = {
+      ark: ["doubao-seed-1-6-flash-250615", "doubao-1-5-vision-pro-32k-250115"],
+      dashscope: ["qwen3-vl-plus", "qwen-vl-plus"]
+    };
+    const verifyModel = TEXT_MODELS[verifyProv]?.[0];
+
+    if (verifyModel && visionText.length > 10) {
       if (!opts.json) {
-        console.log(`\n🔍 验证中 (${CONFIG[verifyProv].name} ${verifyModel})...`);
+        console.log(`\n🔍 事实核查中 (${verifyConfig.name} ${verifyModel})...`);
       }
 
       try {
-        const verifyData = await callAPI(verifyProv, verifyModel, messages, { ...opts, maxTokens: 256 });
-        const verifyResult = verifyData.choices?.[0]?.message?.content || "";
+        // 构建文本验证消息（不带图片）
+        const verifyMessages = [{
+          role: "user",
+          content: `你是一个事实核查助手。以下是一段图片识别结果的描述，请检查其中的事实性错误（人名、作品名、地名、参数值等），如果有错误请逐条指出并给出正确答案，如果没有错误就说"确认无误"。
 
-        // 对比关键实体（人名/作品名等）
-        const primaryText = primaryResult.content || "";
-        const nameMatches = primaryText.match(/[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || [];
-        const chineseMatches = primaryText.match(/[\u4e00-\u9fff]{2,10}(?:·[\u4e00-\u9fff]{2,10})*/g) || [];
-        const allEntities = [...new Set([...nameMatches, ...chineseMatches])].filter(e => e.length > 1);
+图片识别结果："""${visionText}"""`
+        }];
 
-        const verifyNames = verifyResult.match(/[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || [];
-        const verifyChinese = verifyResult.match(/[\u4e00-\u9fff]{2,10}(?:·[\u4e00-\u9fff]{2,10})*/g) || [];
-        const allVerify = [...new Set([...verifyNames, ...verifyChinese])].filter(e => e.length > 1);
-
-        // 找差异
-        const missing = allEntities.filter(e => !allVerify.some(v => v.includes(e) || e.includes(v)));
-        const extra = allVerify.filter(e => !allEntities.some(v => v.includes(e) || e.includes(v)));
-
-        const verified = missing.length === 0 && extra.length === 0;
+        const verifyData = await callAPI(verifyProv, verifyModel, verifyMessages, { ...opts, maxTokens: 512 });
+        const verification = verifyData.choices?.[0]?.message?.content || "（验证无返回）";
+        const hasErrors = !verification.includes("确认无误") && !verification.includes("正确") && verification.length > 20;
 
         if (opts.json) {
           primaryResult.verification = {
-            method: "cross-platform",
-            secondary_model: verifyModel,
-            secondary_provider: verifyProv,
-            status: verified ? "confirmed" : "discrepancy",
-            agreement_ratio: verified ? 1.0 : (1 - missing.length / Math.max(allEntities.length, 1)),
-            primary_only_entities: missing,
-            secondary_only_entities: extra,
-            secondary_summary: verifyResult.slice(0, 200)
+            method: "text-model-factcheck",
+            model: verifyModel,
+            provider: verifyProv,
+            has_corrections: hasErrors,
+            report: verification.slice(0, 500)
           };
         } else {
-          if (verified) {
-            console.log(`\n✅ 验证通过 — 豆包与千问结果一致，可信度高`);
+          if (hasErrors) {
+            console.log(`\n⚠️ 事实核查发现可能错误:`);
+            console.log(`   📋 ${verification.slice(0, 300).replace(/\n/g, "\n   ")}`);
           } else {
-            console.log(`\n⚠️ 发现差异 — 两个平台说法不完全一致:`);
-            if (missing.length > 0) console.log(`   主模型独有: ${missing.join(", ")}`);
-            if (extra.length > 0) console.log(`   验证模型独有: ${extra.join(", ")}`);
-            console.log(`   📋 验证模型回答: ${verifyResult.slice(0, 150)}...`);
+            console.log(`\n✅ 事实核查通过 — 未发现明显错误`);
           }
         }
       } catch (e) {

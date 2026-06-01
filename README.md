@@ -13,7 +13,7 @@
 
 <p align="center">
   <b>给你的 DeepSeek 装上眼睛</b><br>
-  <i>支持豆包 + 千问 双平台视觉识别 &mdash; 自动交叉验证，拒绝AI幻觉</i>
+  <i>双平台视觉识别 + 文本模型事实核查 &mdash; 看图识字，文本纠错</i>
 </p>
 
 <p align="center">
@@ -37,7 +37,7 @@
 | 🔬 **工科图表** | 芯片版图、电路原理图、Bode图、PCB布局 |
 | 🌄 **场景理解** | 详细描述图片内容，识别物体/颜色/表情 |
 | 📊 **图表提取** | 柱状图数据、曲线图趋势、逻辑门分析 |
-| 🔄 **双平台交叉验证** | 自动比对豆包与千问结果，发现差异告警 — 解决AI一本正经胡说八道的问题 |
+| 🧠 **文本事实核查** | 视觉识别后自动用文本模型核对事实，纠正人名/地名/参数错误 — 解决AI一本正经胡说八道的问题 |
 | ⚡ **极速模式** | Doubao fast 平均 <2 秒/张 |
 | 🔄 **双平台容错** | 一个失败自动切换另一个 |
 | 💰 **完全免费** | 两大平台均有慷慨免费额度 |
@@ -208,9 +208,9 @@ node vision.js --list
 node vision.js photo.jpg "这是谁？" --provider ark --verify
 ```
 
-## 🔍 验证模式 `--verify`
+## 🔍 事实核查 `--verify`
 
-需要精确命名（角色名、人名、地名、参数值）时推荐加 `--verify`，它会自动调另一平台模型交叉比对，发现差异时告警。
+视觉模型擅长**看**但不擅长**记**（比如认出 aespa 但可能叫错成员名字）。`--verify` 模式在视觉识别后，自动将识别结果发给**文本模型**进行事实核查，纠正人名/地名/作品名/参数等错误。
 
 ### 开销
 
@@ -223,25 +223,25 @@ node vision.js photo.jpg "这是谁？" --provider ark --verify
 
 ```bash
 # 不加验证（快速）
-node vision.js anime.jpg "这是谁？" --provider ark
-→ 豆包: "五河士道"（1.5s, 680 tok）
+node vision.js aespa.jpg "这是谁？" --provider ark
+→ 豆包: "Karina（柳智敏）, Giselle, Winter, NingNing"（1.7s, 928 tok）
 
-# 加验证（更可靠）
-node vision.js anime.jpg "这是谁？" --provider ark --verify
-→ 豆包: "五河士道"（1.5s, 680 tok）
-→ 千问验证: "常见动漫少女，无法确认" ⚠️ 发现差异
-→ 结论：豆包识别正确（用户已确认）
+# 加验证（文本模型纠错）
+node vision.js aespa.jpg "这是谁？" --provider ark --verify
+→ 豆包: "Karina（柳智敏）, Giselle, Winter, NingNing"
+→ 文本核查: ⚠️ "NingNing" 官方拼写为 "Ningning"（小写n）
+→ 结论：组合正确，成员名大小写修正
 ```
 
 验证结果在 JSON 模式下会输出 `verification` 字段：
 ```json
 {
   "verification": {
-    "status": "confirmed" | "discrepancy",
-    "agreement_ratio": 0.0~1.0,
-    "secondary_model": "qwen-vl-plus",
-    "primary_only_entities": ["..."],
-    "secondary_only_entities": ["..."]
+    "method": "text-model-factcheck",
+    "model": "qwen3-vl-plus",
+    "provider": "dashscope",
+    "has_corrections": false,
+    "report": "经核查...确认无误"
   }
 }
 ```
