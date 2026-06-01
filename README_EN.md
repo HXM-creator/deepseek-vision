@@ -31,9 +31,9 @@
 
 | Capability | Description |
 |:----------|:------------|
-| 🎌 **Anime Character ID** | Doubao exclusive — correctly IDs characters while Qwen fails |
-| 🧑‍🔬 **Celebrity Recognition** | Einstein, Musk, Jack Ma — 100% accuracy |
-| 🗼 **Landmark Recognition** | Eiffel Tower, Golden Gate (Doubao only✅), Great Wall, Opera House |
+| 🎌 **Anime Character ID** | Doubao significantly outperforms Qwen (verified by benchmarks) |
+| 🧑‍🔬 **Celebrity & Landmark** | Both platforms accurately identify common celebrities and landmarks |
+| 🗼 **Landmark Recognition** | Doubao more reliable for landmarks like Golden Gate Bridge |
 | 🔬 **Engineering Diagrams** | Chip layouts, circuit schematics, Bode plots, PCB layouts |
 | 🌄 **Scene Understanding** | Detailed image descriptions, object/color/expression detection |
 | 📊 **Chart Extraction** | Bar chart data, curve trends, logic gate analysis |
@@ -88,7 +88,7 @@ This is Shido Itsuka from Date A Live.
 📊 Token: 672  ⏱️  Time: 1.6s
 ```
 
-> 💡 The same image was tested 3 times with Qwen — all wrong. **For anime, use Doubao.**
+> 💡 Cross-validation shows Doubao is more reliable for anime character recognition.
 
 ### 📈 Demo 2: Engineering Chart (Qwen)
 
