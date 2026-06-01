@@ -170,9 +170,25 @@ Python 3      ← doubao_vision.py 需要（可选）
 # Windows CMD
 set ARK_API_KEY=ark-你的key
 set DASHSCOPE_API_KEY=sk-你的key
+
+# Mac / Linux
+export ARK_API_KEY=ark-你的key
+export DASHSCOPE_API_KEY=sk-你的key
 ```
 
-### 4️⃣ 开始使用
+### 4️⃣ 一键部署（给 AI 用的）
+
+把你的 API Key 给任何 AI，它就能直接部署：
+
+```bash
+git clone https://github.com/HXM-creator/deepseek-vision.git
+cd deepseek-vision
+export ARK_API_KEY=ark-你的key
+export DASHSCOPE_API_KEY=sk-你的key
+node vision.js 图片.jpg "这是什么？"
+```
+
+### 5️⃣ 开始使用
 
 ```bash
 # 🎌 动漫角色识别 → 豆包（推荐！）

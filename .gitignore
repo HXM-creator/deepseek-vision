@@ -22,3 +22,27 @@ benchmark_real/*.png
 # IDE
 .vscode/
 .idea/
+
+# 工作区无关文件（源自 Reasonix 环境）
+*.exe
+*.slx
+.reasonix/truncated-results/
+dist/
+data/
+package-lock.json
+
+# 用户测试脚本（非本仓库）
+analyze_slx*.py
+ask_movie.py
+extract_thumb.py
+gen_docx.js
+gen_skills.js
+generate_vla_doc.py
+image-analyzer-mcp.py
+list_*.py
+qwen-vision-*.py
+search_image*.py
+test_*.py
+test_*.ps1
+xny1.slx
+VLA*.docx

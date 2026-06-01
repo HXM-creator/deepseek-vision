@@ -8,6 +8,12 @@
 import base64, json, urllib.request, urllib.error, sys, os
 
 API_KEY = os.environ.get("ARK_API_KEY", "")
+if not API_KEY:
+    print("❌ 错误: 未设置 ARK_API_KEY 环境变量")
+    print("   请先设置环境变量或在 .env 文件中配置")
+    print("   Windows: set ARK_API_KEY=ark-你的key")
+    print("   Mac/Linux: export ARK_API_KEY=ark-你的key")
+    sys.exit(1)
 BASE = "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
 
 def ask_doubao(image_path, question="请描述这张图片的内容", model_id="doubao-seed-1-6-vision-250815", max_tokens=1024):

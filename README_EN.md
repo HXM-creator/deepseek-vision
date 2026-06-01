@@ -171,9 +171,25 @@ Python 3      ← for doubao_vision.py (optional)
 # Windows CMD
 set ARK_API_KEY=ark-your-key-here
 set DASHSCOPE_API_KEY=sk-your-key-here
+
+# Mac / Linux
+export ARK_API_KEY=ark-your-key-here
+export DASHSCOPE_API_KEY=sk-your-key-here
 ```
 
-### 4️⃣ Start Using
+### 4️⃣ One-Click Deploy (for AI assistants)
+
+Give the URL + your API key to any AI, it can deploy in seconds:
+
+```bash
+git clone https://github.com/HXM-creator/deepseek-vision.git
+cd deepseek-vision
+export ARK_API_KEY=ark-your-key-here
+export DASHSCOPE_API_KEY=sk-your-key-here
+node vision.js image.jpg "What is this?"
+```
+
+### 5️⃣ Start Using
 
 ```bash
 # 🎌 Anime character ID → Doubao (recommended!)

@@ -1,0 +1,35 @@
+{
+  "name": "deepseek-vision",
+  "version": "1.0.0",
+  "description": "Give your DeepSeek eyes 👁️ — Vision recognition toolkit for Reasonix & Claude (Doubao + Qwen)",
+  "main": "vision.js",
+  "scripts": {
+    "analyze": "node vision.js",
+    "list-models": "node vision.js --list",
+    "mcp": "node mcp-vision-server.js",
+    "benchmark": "python benchmark/gen_test.py && python benchmark/gen_eng.py && python benchmark/gen_char.py && python benchmark/gen_famous.py"
+  },
+  "keywords": [
+    "vision",
+    "deepseek",
+    "reasonix",
+    "doubao",
+    "qwen",
+    "mcp",
+    "claude",
+    "image-recognition",
+    "anime-recognition"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "vision.js",
+    "doubao_vision.py",
+    "mcp-vision-server.js",
+    "benchmark/",
+    "README.md",
+    "README_EN.md"
+  ]
+}
