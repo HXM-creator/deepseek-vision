@@ -202,6 +202,47 @@ node vision.js photo.jpg "这是什么？" --provider ark --mode fast
 
 # 📋 查看所有模型
 node vision.js --list
+
+# 🔍 双平台交叉验证（需要精确命名时推荐）
+node vision.js photo.jpg "这是谁？" --provider ark --verify
+```
+
+## 🔍 验证模式 `--verify`
+
+需要精确命名（角色名、人名、地名、参数值）时推荐加 `--verify`，它会自动调另一平台模型交叉比对，发现差异时告警。
+
+### 开销
+
+| 模式 | API 调用 | 额外耗时 | 额外 token | 适合场景 |
+|:----|:-------:|:-------:|:---------:|:--------|
+| 普通 | 1 次 | 基准 | 基准 | 场景描述、特征枚举、图表 |
+| `--verify` | 2 次（主+验证） | **+2~6s** | **+200~600** | 动漫角色、人名、地标、参数 |
+
+### 示例效果
+
+```bash
+# 不加验证（快速）
+node vision.js anime.jpg "这是谁？" --provider ark
+→ 豆包: "五河士道"（1.5s, 680 tok）
+
+# 加验证（更可靠）
+node vision.js anime.jpg "这是谁？" --provider ark --verify
+→ 豆包: "五河士道"（1.5s, 680 tok）
+→ 千问验证: "常见动漫少女，无法确认" ⚠️ 发现差异
+→ 结论：豆包识别正确（用户已确认）
+```
+
+验证结果在 JSON 模式下会输出 `verification` 字段：
+```json
+{
+  "verification": {
+    "status": "confirmed" | "discrepancy",
+    "agreement_ratio": 0.0~1.0,
+    "secondary_model": "qwen-vl-plus",
+    "primary_only_entities": ["..."],
+    "secondary_only_entities": ["..."]
+  }
+}
 ```
 
 ## 🏆 模型选择指南

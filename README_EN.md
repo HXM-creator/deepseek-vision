@@ -203,6 +203,47 @@ node vision.js photo.jpg "What is this?" --provider ark --mode fast
 
 # 📋 List all available models
 node vision.js --list
+
+# 🔍 Cross-platform verification (recommended for precise naming)
+node vision.js photo.jpg "Who is this?" --provider ark --verify
+```
+
+## 🔍 Verification Mode `--verify`
+
+Use `--verify` when you need precise naming (character names, people, landmarks, values). It automatically calls the opposite platform to cross-check results and flags discrepancies.
+
+### Cost
+
+| Mode | API Calls | Extra Time | Extra Tokens | Best For |
+|:----|:---------:|:---------:|:-----------:|:--------|
+| Normal | 1 | baseline | baseline | Scene description, features, charts |
+| `--verify` | 2 (primary+verify) | **+2~6s** | **+200~600** | Anime chars, people, landmarks, values |
+
+### Example
+
+```bash
+# Without verify (fast)
+node vision.js anime.jpg "Who is this?" --provider ark
+→ Doubao: "Shido Itsuka" (1.5s, 680 tok)
+
+# With verify (more reliable)
+node vision.js anime.jpg "Who is this?" --provider ark --verify
+→ Doubao: "Shido Itsuka" (1.5s, 680 tok)
+→ Qwen verify: "Common anime girl, can't identify" ⚠️ Discrepancy
+→ Conclusion: Doubao is correct (confirmed by user)
+```
+
+JSON mode outputs a `verification` field:
+```json
+{
+  "verification": {
+    "status": "confirmed" | "discrepancy",
+    "agreement_ratio": 0.0~1.0,
+    "secondary_model": "qwen-vl-plus",
+    "primary_only_entities": ["..."],
+    "secondary_only_entities": ["..."]
+  }
+}
 ```
 
 ## 🏆 Model Selection Guide
