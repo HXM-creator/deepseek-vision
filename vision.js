@@ -110,6 +110,7 @@ const TASK_PRESETS = {
   ocr: { label: "📝 OCR", provider: "auto", mode: "ocr", verify: false, desc: "文字提取" },
   scene: { label: "🌄 场景", provider: "dashscope", mode: "thinking", verify: false, desc: "详细场景描述" },
   tiny: { label: "⚡ 极省", provider: "ark", mode: "fast", verify: false, desc: "最省token模式，适合手机/大批量" },
+  explain: { label: "📖 讲解", provider: "auto", mode: "balanced", verify: true, desc: "识别内容并生成详细讲解（历史/原理/背景）" },
 };
 
 // ===================== 预算追踪 =====================
@@ -323,6 +324,7 @@ function parseArgs() {
         if (t === "list") { listTasks(); }
         const preset = TASK_PRESETS[t];
         if (preset) {
+          opts.task = t;
           if (!opts.provider || opts.provider === "auto") opts.provider = preset.provider;
           if (!opts.mode || opts.mode === "auto") opts.mode = preset.mode;
           if (preset.verify) opts.verify = true;
@@ -832,7 +834,53 @@ async function main() {
     delete primaryResult._crossCheck;
   }
 
+  // ===== --task explain: 识别后生成讲解 =====
+  if (selectedMode !== "自定义" && selectedMode.replace("auto→", "") !== "自定义" && opts.task === "explain" && primaryResult.content.length > 20) {
+    const explainProv = provider === "ark" ? "dashscope" : "ark";
+    const explainConfig = CONFIG[explainProv];
+    const explainModel = explainProv === "dashscope" ? "qwen3-vl-plus" : "doubao-seed-1-6-flash-250615";
+
+    if (!opts.json) {
+      console.log(`\n📖 生成讲解中 (${explainConfig.name} ${explainModel})...`);
+    }
+
+    try {
+      const explainMessages = [{
+        role: "user",
+        content: `你是一个知识讲解助手。以下是一张图片的识别结果，请根据这个结果生成一段通俗易懂的讲解，涵盖背景知识、相关历史或原理。要求：中文，200字以内，适合普通读者理解。
+
+识别结果："""${primaryResult.content.slice(0, 500)}"""`
+      }];
+
+      const explainData = await callAPI(explainProv, explainModel, explainMessages, { ...opts, maxTokens: 600 });
+      const explanation = explainData.choices?.[0]?.message?.content || "";
+      const tok = explainData.usage?.total_tokens || 0;
+      trackTokens(tok, explainModel, explainProv);
+
+      if (explanation.length > 20) {
+        if (opts.json) {
+          primaryResult.explanation = explanation.slice(0, 800);
+        } else {
+          // 存起来等 printResult 之后显示
+          primaryResult._explanation = explanation;
+          primaryResult._explainTokens = tok;
+        }
+      }
+    } catch (e) {
+      if (!opts.json) console.log(`   ⏭️ 讲解跳过`);
+    }
+  }
+
   printResult(primaryResult, opts);
+
+  // ===== 讲解输出（放在识别结果之后）=====
+  if (primaryResult._explanation) {
+    console.log(`\n${"─".repeat(50)}`);
+    console.log(`📖 知识讲解:`);
+    console.log(`${primaryResult._explanation}\n`);
+    console.log(`📊 +${primaryResult._explainTokens} tok`);
+    delete primaryResult._explanation;
+  }
 
   // ===== --interactive: 交互式追问 =====
   if (opts.interactive && img.url) {

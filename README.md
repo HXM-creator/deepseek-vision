@@ -98,6 +98,7 @@ node vision.js 图片.jpg "这是谁？" --task anime
 | 🔬 **工科电路** | `--task engineering` | 千问 + 验证开启 |
 | 🖼️ **简单物体** | `--task simple` | 最快模型，关闭验证 |
 | ⚡ **极省模式** | `--task tiny` | 最省token，适合大批量/手机 |
+| 📖 **识别+讲解** | `--task explain` | 识别内容并生成背景知识讲解 |
 | 📝 **文字提取** | `--task ocr` | OCR 专用模型 |
 | 🌄 **详细场景** | `--task scene` | 千问深度推理 |
 
