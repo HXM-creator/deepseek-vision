@@ -844,34 +844,46 @@ async function main() {
     delete primaryResult._crossCheck;
   }
 
-  // ===== --task explain: 识别后生成讲解 =====
-  if (selectedMode !== "自定义" && selectedMode.replace("auto→", "") !== "自定义" && opts.task === "explain" && primaryResult.content.length > 20) {
-    const explainProv = provider === "ark" ? "dashscope" : "ark";
-    const explainConfig = CONFIG[explainProv];
-    const explainModel = explainProv === "dashscope" ? "qwen3-vl-plus" : "doubao-seed-1-6-flash-250615";
+  // ===== --task explain: 智能讲解 =====
+  if (opts.task === "explain" && primaryResult.content?.length > 20) {
+    const textProv = provider === "ark" ? "dashscope" : "ark";
+    const textConfig = CONFIG[textProv];
+    const textModel = textProv === "dashscope" ? "qwen3-vl-plus" : "doubao-seed-1-6-flash-250615";
+    const visionText = primaryResult.content.slice(0, 600);
 
+    // 判断图片类型，选择讲解方向
     if (!opts.json) {
-      console.log(`\n📖 生成讲解中 (${explainConfig.name} ${explainModel})...`);
+      console.log(`\n📖 生成讲解中 (${textConfig.name} ${textModel})...`);
     }
 
     try {
       const explainMessages = [{
         role: "user",
-        content: `你是一个知识讲解助手。以下是一张图片的识别结果，请根据这个结果生成一段通俗易懂的讲解，涵盖背景知识、相关历史或原理。要求：中文，200字以内，适合普通读者理解。
+        content: `你是一个知识讲解助手。根据以下图片识别结果，判断这是什么类型的内容，然后做对应的讲解：
 
-识别结果："""${primaryResult.content.slice(0, 500)}"""`
+识别结果："""${visionText}"""
+
+规则：
+1. 如果是**动漫/影视角色** → 简略介绍作品背景、角色定位（100字内）
+2. 如果是**建筑/地标** → 介绍历史、特色（100字内）
+3. 如果是**工科/电路/芯片** → 介绍功能、原理（100字内）
+4. 如果是**动物/植物/食物** → 一句话带过，不需要讲解
+5. 如果是**文字/表格/OCR** → 不需要讲解
+
+先一句话判断类型，然后给出讲解。`
       }];
 
-      const explainData = await callAPI(explainProv, explainModel, explainMessages, { ...opts, maxTokens: 600 });
+      const explainData = await callAPI(textProv, textModel, explainMessages, { ...opts, maxTokens: 400 });
       const explanation = explainData.choices?.[0]?.message?.content || "";
       const tok = explainData.usage?.total_tokens || 0;
-      trackTokens(tok, explainModel, explainProv);
+      trackTokens(tok, textModel, textProv);
 
-      if (explanation.length > 20) {
+      const skipTypes = ["不需要讲解", "一句话带过", "食物类型", "动物", "植物", "文字", "OCR", "表格"];
+      const shouldSkip = skipTypes.some(s => explanation.includes(s)) && explanation.length < 80;
+      if (explanation.length > 20 && !shouldSkip) {
         if (opts.json) {
           primaryResult.explanation = explanation.slice(0, 800);
         } else {
-          // 存起来等 printResult 之后显示
           primaryResult._explanation = explanation;
           primaryResult._explainTokens = tok;
         }
