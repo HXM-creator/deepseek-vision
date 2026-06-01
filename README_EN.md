@@ -127,6 +127,18 @@ Vision models make two types of mistakes. `--verify` catches both:
 
 Auto-enabled for "Who/What" questions. Skip with `--no-verify`.
 
+### 🤝 Cross-Platform Disagreement
+
+When Doubao and Qwen disagree, **Doubao's conclusion is preferred by default**. Based on 28-image benchmark testing, Doubao is more accurate for naming tasks (anime characters, people, landmarks).
+
+```bash
+# Example output
+⚠️ Discrepancy found:
+   Primary only: Bay Bridge
+   Cross only: Golden Gate Bridge
+💡 Based on benchmarks, Doubao is more accurate for naming. Prefer Doubao's result.
+```
+
 ### Cost
 
 | Mode | API Calls | Extra Time | Extra Tokens |

@@ -171,6 +171,9 @@ function computeConfidence(result) {
   if (fc?.has_corrections === false) { score += 1; reasons.push("事实核查通过"); }
   else if (fc?.has_corrections === true) { score -= 1; reasons.push("发现事实错误"); }
 
+  // 豆包优先
+  if (v?.doubao_preferred === true) { score += 0; reasons.push("豆包结论优先"); }
+
   score = Math.max(1, Math.min(5, score));
   const stars = "★".repeat(score) + "☆".repeat(5 - score);
   const labels = { 1: "低可信度", 2: "需谨慎", 3: "中等", 4: "较可信", 5: "高可信度" };
@@ -691,6 +694,16 @@ async function main() {
       const extra = crossNames.filter(e => !primaryNames.some(v => e.includes(v) || v.includes(e)));
       const visionMatch = missing.length === 0 && extra.length === 0;
 
+      // Doubao 优先策略：当两个平台结果不一致时，优先采纳豆包的结论
+      const doubaoInvolved = provider === "ark" || crossProv === "ark";
+      const doubaoPreferred = !visionMatch && doubaoInvolved;
+      let priorityNote = "";
+
+      if (doubaoPreferred) {
+        const doubaoName = provider === "ark" ? modelName : crossModel;
+        priorityNote = `基于基准测试，豆包在命名类识别上更准确，建议优先采纳豆包(${doubaoName})的结果。`;
+      }
+
       if (!opts.json) {
         if (visionMatch) {
           console.log(`   ✅ 双模型结果一致，未发现矛盾`);
@@ -698,6 +711,7 @@ async function main() {
           console.log(`   ⚠️ 存在不一致：`);
           if (missing.length > 0) console.log(`     主模型独有: ${missing.slice(0,5).join(", ")}`);
           if (extra.length > 0) console.log(`     验证模型独有: ${extra.slice(0,5).join(", ")}`);
+          if (priorityNote) console.log(`   💡 ${priorityNote}`);
         }
       }
 
@@ -748,6 +762,8 @@ async function main() {
         if (opts.json) {
           primaryResult.verification = {
             method: "cross-vision + fact-check",
+            doubao_preferred: doubaoPreferred,
+            priority_note: priorityNote,
             cross_vision: {
               model: crossModel,
               provider: crossProv,
