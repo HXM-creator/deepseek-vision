@@ -1,58 +1,59 @@
 ---
 name: doubao-vision
-description: 视觉模型调用工具集 — 整合火山引擎豆包 + 阿里云千问，支持 MCP 协议
+description: 视觉识别工具 — 双平台(豆包+千问) + 双重验证 + 场景预设
 ---
 ## 工具文件
 
 | 文件 | 说明 |
 |:----|:----|
-| `vision.js` | 🏆 **主力脚本** — 整合豆包+千问，支持智能选模/OCR/深度思考 |
-| `doubao_vision.py` | 🐍 备用脚本 — 仅豆包，Python 版 |
-| `mcp-vision-server.js` | 🤖 **Claude MCP 服务器** — 供 Claude Desktop/Code 调用 |
+| `vision.js` | 🏆 **主力脚本** — 整合豆包+千问，全部功能 |
+| `mcp-vision-server.js` | 🤖 **MCP 服务器** — 供 Claude 等客户端调用 |
+
+> `doubao_vision.py` 已弃用，功能已全部迁移到 vision.js
 
 ## 快速使用
 
 ```bash
-# Windows
+# 设置 API Key
 set ARK_API_KEY=ark-你的key
 set DASHSCOPE_API_KEY=sk-你的key
 
-# Mac / Linux
-export ARK_API_KEY=ark-你的key
-export DASHSCOPE_API_KEY=sk-你的key
+# 🎌 动漫识别（推荐：场景预设）
+node vision.js photo.jpg "这是谁？" --task anime
 
-# 智能识别（豆包自动选）
-node vision.js photo.jpg "这是谁？"
+# 🔬 工科分析
+node vision.js photo.jpg "分析" --task engineering
 
-# 指定豆包（动漫角色识别推荐）
-node vision.js photo.jpg "这是谁？" --provider ark
+# 💬 交互模式（连续追问）
+node vision.js photo.jpg "这是谁？" --interactive
 
-# 指定千问（详细场景描述推荐）
-node vision.js photo.jpg "详细描述" --free
+# 📊 用量统计
+node vision.js --budget
 
-# 启动 Claude MCP 服务器
+# 🤖 MCP 服务器
 node mcp-vision-server.js
 ```
 
-## MCP 协议接入
+## 场景预设 `--task`
 
-支持任何 MCP 兼容客户端。MCP 客户端配置：
-```json
-{
-  "mcpServers": {
-    "deepseek-vision": {
-      "command": "node",
-      "args": ["路径/mcp-vision-server.js"]
-    }
-  }
-}
-```
+| 场景 | 命令 | 效果 |
+|:----|:----|:------|
+| 🎌 动漫 | `--task anime` | 豆包+验证 |
+| 🔬 工科 | `--task engineering` | 千问+验证 |
+| 🖼️ 简单物体 | `--task simple` | 最快，不验证 |
+| 📝 OCR | `--task ocr` | 文字提取 |
+| 🌄 场景 | `--task scene` | 千问深度推理 |
+
+## 双重验证
+
+问"这是谁"时自动开启双重验证：
+1. 🔍 交叉视觉 — 另一平台再识别，发现"看走眼"
+2. 📖 文本核查 — 纠正人名/地名/参数错误
 
 ## 前提条件
 
 - Node.js 18+
-- Python 3（doubao_vision.py 可选）
-- 至少一个 API Key（通过环境变量设置）
+- 至少一个 API Key
 
 ## API Key 获取
 
