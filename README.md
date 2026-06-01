@@ -97,6 +97,7 @@ node vision.js 图片.jpg "这是谁？" --task anime
 | 🎌 **动漫角色** | `--task anime` | 豆包 + 验证开启 |
 | 🔬 **工科电路** | `--task engineering` | 千问 + 验证开启 |
 | 🖼️ **简单物体** | `--task simple` | 最快模型，关闭验证 |
+| ⚡ **极省模式** | `--task tiny` | 最省token，适合大批量/手机 |
 | 📝 **文字提取** | `--task ocr` | OCR 专用模型 |
 | 🌄 **详细场景** | `--task scene` | 千问深度推理 |
 
@@ -126,6 +127,16 @@ node vision.js circuit.png "分析" --task engineering
 ```
 
 问"这是谁？""什么角色？"时**自动开启**，无需手动加参数。想跳过用 `--no-verify`。
+
+### 💡 省 token 技巧
+
+| 做法 | 节省 | 说明 |
+|:----|:---:|:------|
+| 用 `--task tiny` | ~70% | 按快模型+关闭验证，适合大批量 |
+| 先压缩图片到 <1MB | ~60% | 图片越小，编码后 token 越少 |
+| 用 `--task simple` 识物 | ~50% | 简单物体不需要验证 |
+| 用 `--interactive` | 每次省50% | 同一张图追问不用重复传图 |
+| 避免 `--format markdown` | ~10% | markdown 格式比纯文本略长 |
 
 ### 开销
 

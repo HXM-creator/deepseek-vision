@@ -30,7 +30,7 @@
  *   --free             优先使用免费额度模型
  *   --verify           事实核查：视觉识别后自动用文本模型核对事实
  *   --no-verify        跳过自动验证（OCR/简单物体识别默认跳过，问"这是谁"时自动开启）
- *   --task <name>      场景预设：anime / engineering / simple / ocr / scene
+ *   --task <name>      场景预设：anime / engineering / simple / ocr / scene / tiny（极省）
  *   --format markdown  结构化输出（Markdown格式）
  *   --interactive      交互式追问模式（不退出程序，连续提问）
  *   --budget           查看用量统计
@@ -109,6 +109,7 @@ const TASK_PRESETS = {
   simple: { label: "🖼️ 简单", provider: "ark", mode: "fast", verify: false, desc: "单一物体识别（猫/狗/花）" },
   ocr: { label: "📝 OCR", provider: "auto", mode: "ocr", verify: false, desc: "文字提取" },
   scene: { label: "🌄 场景", provider: "dashscope", mode: "thinking", verify: false, desc: "详细场景描述" },
+  tiny: { label: "⚡ 极省", provider: "ark", mode: "fast", verify: false, desc: "最省token模式，适合手机/大批量" },
 };
 
 // ===================== 预算追踪 =====================
@@ -446,7 +447,11 @@ async function encodeImage(imagePath) {
     const data = fs.readFileSync(imagePath);
     const ext = path.extname(imagePath).toLowerCase().slice(1) || "png";
     const mime = { jpg: "jpeg", jpeg: "jpeg", png: "png", gif: "gif", webp: "webp", bmp: "bmp", svg: "svg+xml" }[ext] || "png";
-    return { url: `data:image/${mime};base64,${data.toString("base64")}`, type: "base64", size: data.length };
+    const size = data.length;
+    if (size > 1024 * 1024) {
+      console.warn(`   ⚠️ 图片较大 (${(size/1024/1024).toFixed(1)}MB)，建议先压缩再识别以节省token`);
+    }
+    return { url: `data:image/${mime};base64,${data.toString("base64")}`, type: "base64", size };
   } catch (e) {
     throw new Error(`无法读取图片: ${imagePath}\n${e.message}`);
   }
