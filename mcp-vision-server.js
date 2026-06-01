@@ -2,11 +2,11 @@
 /**
  * DeepSeek Vision MCP Server
  * 
- * Claude Desktop / Claude Code MCP integration.
- * Exposes vision analysis as MCP tools.
+ * MCP (Model Context Protocol) server.
+ * Exposes vision analysis as MCP tools for any MCP-compatible client.
  *
- * Usage with Claude Desktop:
- *   Add to claude_desktop_config.json:
+ * Usage with MCP clients (Claude Desktop, etc.):
+ *   Add to client config:
  *   {
  *     "mcpServers": {
  *       "deepseek-vision": {
@@ -15,9 +15,6 @@
  *       }
  *     }
  *   }
- *
- * Usage with Claude Code:
- *   claude mcp add deepseek-vision -e "node path/to/mcp-vision-server.js"
  */
 
 const fs = require("fs");
