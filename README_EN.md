@@ -2,18 +2,18 @@
   <img src="https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white" alt="Node.js">
   <img src="https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/License-MIT-orange" alt="License">
-  <img src="https://img.shields.io/badge/DeepSeek-Reasonix-8B5CF6" alt="DeepSeek Reasonix">
+  <img src="https://img.shields.io/badge/DeepSeek-Vision-8B5CF6" alt="DeepSeek Vision">
   <img src="https://img.shields.io/badge/Doubao-ARK-FF6B35" alt="Doubao ARK">
   <img src="https://img.shields.io/badge/Qwen-DashScope-00A3FF" alt="Qwen DashScope">
 </p>
 
 <h1 align="center">
-  👁️ Reasonix Vision
+  👁️ DeepSeek Vision
 </h1>
 
 <p align="center">
-  <b>Give Your DeepSeek Eyes</b><br>
-  <i>Visual recognition toolkit for Reasonix Code — Doubao + Qwen dual-platform</i>
+  <b>Give Your AI Eyes</b><br>
+  <i>Universal vision toolkit — works with DeepSeek / Claude / CLI — Doubao + Qwen dual-platform</i>
 </p>
 
 <p align="center">
@@ -318,6 +318,6 @@ MIT
 ---
 
 <p align="center">
-  <b>Reasonix Vision — Give Your DeepSeek Eyes</b><br>
+  <b>DeepSeek Vision — Give Your AI Eyes</b><br>
   <a href="README.md">🌐 中文版本</a>
 </p>

@@ -1,7 +1,7 @@
 {
   "name": "deepseek-vision",
   "version": "1.0.0",
-  "description": "Give your DeepSeek eyes 👁️ — Vision recognition toolkit for Reasonix & Claude (Doubao + Qwen)",
+  "description": "Give your AI eyes 👁️ — Universal vision toolkit for DeepSeek / Claude / CLI (Doubao + Qwen)",
   "main": "vision.js",
   "scripts": {
     "analyze": "node vision.js",
