@@ -675,6 +675,8 @@ async function main() {
 
     let crossText = "";
     let crossResult = null;
+    let doubaoPreferred = false;
+    let priorityNote = "";
 
     try {
       const crossData = await callAPI(crossProv, crossModel, messages, { ...opts, maxTokens: 300 });
@@ -696,8 +698,8 @@ async function main() {
 
       // Doubao 优先策略：当两个平台结果不一致时，优先采纳豆包的结论
       const doubaoInvolved = provider === "ark" || crossProv === "ark";
-      const doubaoPreferred = !visionMatch && doubaoInvolved;
-      let priorityNote = "";
+      doubaoPreferred = !visionMatch && doubaoInvolved;
+      priorityNote = "";
 
       if (doubaoPreferred) {
         const doubaoName = provider === "ark" ? modelName : crossModel;
@@ -713,6 +715,17 @@ async function main() {
           if (extra.length > 0) console.log(`     验证模型独有: ${extra.slice(0,5).join(", ")}`);
           if (priorityNote) console.log(`   💡 ${priorityNote}`);
         }
+      }
+
+      // 自动切换：当主模型是千问且豆包验证结果不同时，直接采用豆包结论
+      if (doubaoPreferred && provider !== "ark" && crossText.length > 20) {
+        const oldContent = primaryResult.content;
+        primaryResult.content = `[📌 已自动切换为豆包结论] ${crossText}\n\n---\n⚠️ 原${config.name}结论: ${oldContent.slice(0, 150)}...`;
+        if (!opts.json) {
+          console.log(`\n🔄 已自动切换为豆包结论（原${config.name}识别有偏差）`);
+        }
+        // 同步更新 crossCheck 标记为主模型已被替换
+        primaryResult._switchedToDoubao = true;
       }
 
       // 存储交叉验证结果
@@ -760,9 +773,11 @@ async function main() {
         const hasIssues = textClean.length > 10 && !textReport.includes("确认无误");
 
         if (opts.json) {
+          const switched = primaryResult._switchedToDoubao || false;
           primaryResult.verification = {
             method: "cross-vision + fact-check",
             doubao_preferred: doubaoPreferred,
+            switched_to_doubao: switched,
             priority_note: priorityNote,
             cross_vision: {
               model: crossModel,
@@ -791,6 +806,26 @@ async function main() {
       } catch (e) {
         if (!opts.json) console.log(`   ⏭️ 事实核查跳过`);
       }
+    }
+
+    // 兜底：如果事实核查未执行但交叉验证有结果，仍然输出验证字段
+    if (!primaryResult.verification && primaryResult._crossCheck) {
+      const switched = primaryResult._switchedToDoubao || false;
+      primaryResult.verification = {
+        method: "cross-vision (fact-check skipped)",
+        doubao_preferred: doubaoPreferred,
+        switched_to_doubao: switched,
+        priority_note: priorityNote || "",
+        cross_vision: {
+          model: crossModel,
+          provider: crossProv,
+          match: primaryResult._crossCheck?.match ?? "unknown",
+          discrepancies: {
+            primary_only: primaryResult._crossCheck?.primaryOnly || [],
+            cross_only: primaryResult._crossCheck?.crossOnly || []
+          }
+        }
+      };
     }
 
     // 清理临时字段
