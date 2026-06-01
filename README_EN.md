@@ -209,23 +209,32 @@ node vision.js --list
 node vision.js photo.jpg "Who is this?" --provider ark --verify
 ```
 
-## 🔍 Fact-Checking `--verify`
+## 🔍 Dual Verification `--verify`
 
-Vision models are great at **seeing** but not at **remembering** (e.g., they can identify aespa but might get member names wrong). `--verify` mode sends the vision output to a **text model** for fact-checking, correcting names, places, titles, and values.
+Vision models make two types of mistakes: **misidentifying** (seeing Golden Gate as Bay Bridge) and **misnaming** (calling Giselle by Winter's name). `--verify` uses two layers to catch both.
+
+### Verification Flow
+
+```
+🖼️ Primary vision → text output
+      ↓
+🔍 Cross-vision → another model re-analyzes → compare → catches "misidentification"
+      ↓
+📖 Text fact-check → verifies names/facts in text → catches "misnaming"
+      ↓
+📋 Combined report
+```
 
 ### Auto-Trigger
 
-When asking "Who is this?" or "What character?", **`--verify` auto-enables**. Use `--no-verify` to skip:
+When asking "Who/What" questions, **`--verify` auto-enables**. Use `--no-verify` to skip:
 
 ```bash
-# Auto-verify: triggered by "who/what" questions
-node vision.js anime.jpg "Who is this?" --provider ark
+# Auto dual verification
+node vision.js image.jpg "Who is this?" --provider ark
 
-# Manual skip
-node vision.js anime.jpg "Who is this?" --provider ark --no-verify
-
-# Manual enable (auto-trigger already does this, but explicit is fine)
-node vision.js anime.jpg "Who is this?" --provider ark --verify
+# Skip verification
+node vision.js image.jpg "Who is this?" --provider ark --no-verify
 ```
 
 ### Cost
@@ -239,25 +248,35 @@ node vision.js anime.jpg "Who is this?" --provider ark --verify
 
 ```bash
 # Without verify (fast)
-node vision.js aespa.jpg "Who are they?" --provider ark
-→ Doubao: "Karina, Giselle, Winter, NingNing" (1.7s, 928 tok)
+node vision.js bridge.jpg "What bridge?" --free
+→ Qwen: "San Francisco-Oakland Bay Bridge" (3s)
 
-# With verify (text model fact-checks)
-node vision.js aespa.jpg "Who are they?" --provider ark --verify
-→ Doubao: "Karina, Giselle, Winter, NingNing"
-→ Text check: ⚠️ "NingNing" should be "Ningning" (lowercase n)
-→ Conclusion: Group correct, member name capitalization fixed
+# With verify (dual verification)
+node vision.js bridge.jpg "What bridge?" --free --verify
+→ Qwen: "San Francisco-Oakland Bay Bridge"
+→ 🔍 Doubao cross-check: "Golden Gate Bridge" ⚠️ Discrepancy
+   ├ Primary only: Bay Bridge, Oakland Bay...
+   └ Cross only: Golden Gate Bridge ✅
+→ 📖 Fact-check: confirmed no text errors
+→ Conclusion: Doubao is correct, it's Golden Gate Bridge
 ```
 
 JSON mode outputs a `verification` field:
 ```json
 {
   "verification": {
-    "method": "text-model-factcheck",
-    "model": "qwen3-vl-plus",
-    "provider": "dashscope",
-    "has_corrections": false,
-    "report": "Fact check passed, no errors found"
+    "method": "cross-vision + fact-check",
+    "cross_vision": {
+      "match": false,
+      "discrepancies": {
+        "primary_only": ["Bay Bridge"],
+        "cross_only": ["Golden Gate Bridge"]
+      }
+    },
+    "fact_check": {
+      "has_corrections": false,
+      "report": "Confirmed, no errors"
+    }
   }
 }
 ```

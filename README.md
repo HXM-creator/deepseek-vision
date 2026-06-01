@@ -208,23 +208,32 @@ node vision.js --list
 node vision.js photo.jpg "这是谁？" --provider ark --verify
 ```
 
-## 🔍 事实核查 `--verify`
+## 🔍 双重验证 `--verify`
 
-视觉模型擅长**看**但不擅长**记**（比如认出 aespa 但可能叫错成员名字）。`--verify` 模式在视觉识别后，自动将识别结果发给**文本模型**进行事实核查，纠正人名/地名/作品名/参数等错误。
+视觉模型会犯两类错误：**看走眼**（金门大桥看成海湾大桥）和**记错名**（Giselle 叫成金旼炡）。`--verify` 模式用两层验证来捕捉这两类错误：
+
+### 验证流程
+
+```
+🖼️ 主视觉 → 输出文本
+      ↓
+🔍 交叉视觉 → 另一平台再识别一次 → 比对差异 → 发现"看走眼"
+      ↓
+📖 文本核查 → 检查文本中的事实错误 → 发现"记错名"
+      ↓
+📋 综合报告
+```
 
 ### 自动触发
 
-问"这是谁？""什么角色？""什么建筑？"等问题时，**`--verify` 默认自动开启**。如果不需要验证，加 `--no-verify` 跳过：
+问"这是谁？""什么角色？""什么建筑？"等问题时，**`--verify` 默认自动开启**。不需要验证时加 `--no-verify` 跳过：
 
 ```bash
-# 自动验证：问"谁/什么角色"时自动开启
-node vision.js anime.jpg "这是谁？" --provider ark
+# 自动双重验证
+node vision.js image.jpg "这是谁？" --provider ark
 
-# 手动跳过验证
-node vision.js anime.jpg "这是谁？" --provider ark --no-verify
-
-# 手动开启（虽然会自动开，但显式写也行）
-node vision.js anime.jpg "这是谁？" --provider ark --verify
+# 跳过验证
+node vision.js image.jpg "这是谁？" --provider ark --no-verify
 ```
 
 ### 开销
@@ -238,25 +247,39 @@ node vision.js anime.jpg "这是谁？" --provider ark --verify
 
 ```bash
 # 不加验证（快速）
-node vision.js aespa.jpg "这是谁？" --provider ark
-→ 豆包: "Karina（柳智敏）, Giselle, Winter, NingNing"（1.7s, 928 tok）
+node vision.js bridge.jpg "这是什么桥？" --free
+→ Qwen: "旧金山-奥克兰海湾大桥"（3s）
 
-# 加验证（文本模型纠错）
-node vision.js aespa.jpg "这是谁？" --provider ark --verify
-→ 豆包: "Karina（柳智敏）, Giselle, Winter, NingNing"
-→ 文本核查: ⚠️ "NingNing" 官方拼写为 "Ningning"（小写n）
-→ 结论：组合正确，成员名大小写修正
+# 加验证（双重验证纠错）
+node vision.js bridge.jpg "这是什么桥？" --free --verify
+→ Qwen: "旧金山-奥克兰海湾大桥"
+→ 🔍 豆包交叉: "Golden Gate Bridge" ⚠️ 存在不一致
+   ├ 主模型独有: 海湾大桥, Oakland Bay...
+   └ 验证模型独有: Golden Gate Bridge ✅
+→ 📖 文本核查: 确认无误（输出文本本身无事实错误）
+→ 结论：豆包识别正确，这是金门大桥
 ```
 
 验证结果在 JSON 模式下会输出 `verification` 字段：
 ```json
 {
   "verification": {
-    "method": "text-model-factcheck",
-    "model": "qwen3-vl-plus",
-    "provider": "dashscope",
-    "has_corrections": false,
-    "report": "经核查...确认无误"
+    "method": "cross-vision + fact-check",
+    "cross_vision": {
+      "model": "doubao-seed-1-6-flash-250615",
+      "provider": "ark",
+      "match": false,
+      "discrepancies": {
+        "primary_only": ["海湾大桥", "Oakland Bay"],
+        "cross_only": ["Golden Gate Bridge"]
+      }
+    },
+    "fact_check": {
+      "model": "doubao-seed-1-6-flash-250615",
+      "provider": "ark",
+      "has_corrections": false,
+      "report": "确认无误"
+    }
   }
 }
 ```

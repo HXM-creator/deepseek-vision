@@ -476,57 +476,130 @@ async function main() {
   const timing = (Date.now() - startTime) / 1000;
   const primaryResult = formatResult(data, modelName, provider, timing, selectedMode);
 
-  // ===== --verify: 文本模型事实核查 =====
+  // ===== --verify: 方案C — 双视觉交叉比 + 文本事实核查 =====
   if (opts.verify) {
     const visionText = primaryResult.content || "";
-    const verifyProv = provider === "ark" ? "dashscope" : "ark";
-    const verifyConfig = CONFIG[verifyProv];
+    const crossProv = provider === "ark" ? "dashscope" : "ark";
+    const crossConfig = CONFIG[crossProv];
 
-    // 可用的文本模型（用于验证，不需要视觉能力）
-    const TEXT_MODELS = {
-      ark: ["doubao-seed-1-6-flash-250615", "doubao-1-5-vision-pro-32k-250115"],
-      dashscope: ["qwen3-vl-plus", "qwen-vl-plus"]
-    };
-    const verifyModel = TEXT_MODELS[verifyProv]?.[0];
+    // 1. 用另一平台的视觉模型再识别一次
+    const crossModels = Object.entries(MODELS).filter(([_, i]) => i.provider === crossProv);
+    const crossModel = crossModels.find(([n]) => n.includes("flash") || n.includes("plus"))?.[0]
+      || crossModels[0]?.[0];
 
-    if (verifyModel && visionText.length > 10) {
+    if (!opts.json) {
+      console.log(`\n🔍 交叉验证 (${crossConfig.name} ${crossModel})...`);
+    }
+
+    let crossText = "";
+    let crossResult = null;
+
+    try {
+      const crossData = await callAPI(crossProv, crossModel, messages, { ...opts, maxTokens: 300 });
+      crossText = crossData.choices?.[0]?.message?.content || "";
+      crossResult = crossText;
+
+      // 提取实体对比
+      const getNames = (t) => [...new Set([
+        ...(t.match(/[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || []),
+        ...(t.match(/[\u4e00-\u9fff]{2,8}(?:·[\u4e00-\u9fff]{2,8})*/g) || [])
+      ])].filter(e => e.length > 1 && e.length < 30);
+
+      const primaryNames = getNames(visionText);
+      const crossNames = getNames(crossText);
+
+      const missing = primaryNames.filter(e => !crossNames.some(v => e.includes(v) || v.includes(e)));
+      const extra = crossNames.filter(e => !primaryNames.some(v => e.includes(v) || v.includes(e)));
+      const visionMatch = missing.length === 0 && extra.length === 0;
+
       if (!opts.json) {
-        console.log(`\n🔍 事实核查中 (${verifyConfig.name} ${verifyModel})...`);
+        if (visionMatch) {
+          console.log(`   ✅ 双模型结果一致，未发现矛盾`);
+        } else {
+          console.log(`   ⚠️ 存在不一致：`);
+          if (missing.length > 0) console.log(`     主模型独有: ${missing.slice(0,5).join(", ")}`);
+          if (extra.length > 0) console.log(`     验证模型独有: ${extra.slice(0,5).join(", ")}`);
+        }
+      }
+
+      // 存储交叉验证结果
+      primaryResult._crossCheck = {
+        match: visionMatch,
+        primaryOnly: missing,
+        crossOnly: extra,
+        crossSummary: crossText.slice(0, 200)
+      };
+
+    } catch (e) {
+      if (!opts.json) console.log(`   ⏭️ 交叉验证跳过 (${e.message.slice(0, 50)})`);
+    }
+
+    // 2. 文本模型事实核查（仅对主结果）
+    const textProv = crossProv; // 用另一家的文本模型
+    const textConfig = CONFIG[textProv];
+    const TEXT_MODELS = {
+      ark: ["doubao-seed-1-6-flash-250615"],
+      dashscope: ["qwen3-vl-plus"]
+    };
+    const textModel = TEXT_MODELS[textProv]?.[0];
+
+    if (textModel && visionText.length > 10) {
+      if (!opts.json) {
+        console.log(`\n📖 事实核查 (${textConfig.name} ${textModel})...`);
       }
 
       try {
-        // 构建文本验证消息（不带图片）
-        const verifyMessages = [{
+        const textMessages = [{
           role: "user",
-          content: `你是一个事实核查助手。以下是一段图片识别结果的描述，请检查其中的事实性错误（人名、作品名、地名、参数值等），如果有错误请逐条指出并给出正确答案，如果没有错误就说"确认无误"。
+          content: `你是一个事实核查助手。以下是一段图片识别结果描述，请逐条核查其中的事实性错误（人名/作品名/地名/参数值等）。
 
-图片识别结果："""${visionText}"""`
+识别结果："""${visionText}"""
+
+要求：
+- 如果全部正确 → 回复"确认无误"
+- 如果有错误 → 逐条指出并给出正确答案
+- 如果不确定 → 说"无法确认"`
         }];
 
-        const verifyData = await callAPI(verifyProv, verifyModel, verifyMessages, { ...opts, maxTokens: 512 });
-        const verification = verifyData.choices?.[0]?.message?.content || "（验证无返回）";
-        const hasErrors = !verification.includes("确认无误") && !verification.includes("正确") && verification.length > 20;
+        const textData = await callAPI(textProv, textModel, textMessages, { ...opts, maxTokens: 512 });
+        const textReport = textData.choices?.[0]?.message?.content || "（无返回）";
+        const textClean = textReport.replace(/确认无误/g, "").trim();
+        const hasIssues = textClean.length > 10 && !textReport.includes("确认无误");
 
         if (opts.json) {
           primaryResult.verification = {
-            method: "text-model-factcheck",
-            model: verifyModel,
-            provider: verifyProv,
-            has_corrections: hasErrors,
-            report: verification.slice(0, 500)
+            method: "cross-vision + fact-check",
+            cross_vision: {
+              model: crossModel,
+              provider: crossProv,
+              match: primaryResult._crossCheck?.match ?? "unknown",
+              discrepancies: {
+                primary_only: primaryResult._crossCheck?.primaryOnly || [],
+                cross_only: primaryResult._crossCheck?.crossOnly || []
+              }
+            },
+            fact_check: {
+              model: textModel,
+              provider: textProv,
+              has_corrections: hasIssues,
+              report: textReport.slice(0, 500)
+            }
           };
         } else {
-          if (hasErrors) {
+          if (hasIssues) {
             console.log(`\n⚠️ 事实核查发现可能错误:`);
-            console.log(`   📋 ${verification.slice(0, 300).replace(/\n/g, "\n   ")}`);
+            console.log(`   ${textReport.slice(0, 300).replace(/\n/g, "\n   ")}`);
           } else {
             console.log(`\n✅ 事实核查通过 — 未发现明显错误`);
           }
         }
       } catch (e) {
-        if (!opts.json) console.log(`   ⏭️ 验证跳过 (${e.message.slice(0, 50)})`);
+        if (!opts.json) console.log(`   ⏭️ 事实核查跳过`);
       }
     }
+
+    // 清理临时字段
+    delete primaryResult._crossCheck;
   }
 
   printResult(primaryResult, opts);
