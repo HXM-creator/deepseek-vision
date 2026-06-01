@@ -28,6 +28,10 @@ benchmark_real/*.png
 # 本地用量追踪
 .vision_budget.json
 
+# 临时文件（自动压缩缓存）
+.tmp_*
+.tmp_py_*
+
 # 个人 skill（不进仓库，仅供本地 Reasonix 使用）
 .reasonix/skills/git-push.md
 

@@ -444,12 +444,38 @@ async function encodeImage(imagePath) {
     }
   }
   try {
-    const data = fs.readFileSync(imagePath);
+    let data = fs.readFileSync(imagePath);
     const ext = path.extname(imagePath).toLowerCase().slice(1) || "png";
     const mime = { jpg: "jpeg", jpeg: "jpeg", png: "png", gif: "gif", webp: "webp", bmp: "bmp", svg: "svg+xml" }[ext] || "png";
-    const size = data.length;
-    if (size > 1024 * 1024) {
-      console.warn(`   ⚠️ 图片较大 (${(size/1024/1024).toFixed(1)}MB)，建议先压缩再识别以节省token`);
+    let size = data.length;
+
+    // 自动压缩大图（>800KB）
+    if (size > 800 * 1024) {
+      try {
+        const tmpImg = path.join(__dirname, `.tmp_${Date.now()}.${mime}`);
+        const tmpPy = path.join(__dirname, `.tmp_py_${Date.now()}.py`);
+        const pyScript = `from PIL import Image; import sys
+img=Image.open(r"${imagePath.replace(/\\/g,'/')}")
+w,h=img.size
+if w>1024 or h>1024:
+ r=1024/max(w,h)
+ img=img.resize((int(w*r),int(h*r)),Image.LANCZOS)
+ img.save(r"${tmpImg.replace(/\\/g,'/')}")
+ print(f"{w}x{h}->{img.size[0]}x{img.size[1]}")
+else:
+ print("skip")`;
+        fs.writeFileSync(tmpPy, pyScript);
+        const out = execSync(`python "${tmpPy}"`, { encoding: "utf8", timeout: 15000 }).trim();
+        try { fs.unlinkSync(tmpPy); } catch {}
+        if (out.includes("->")) {
+          data = fs.readFileSync(tmpImg);
+          size = data.length;
+          console.log(`   🖼️ 已压缩 ${out} (${(size/1024).toFixed(0)}KB)`);
+        }
+        try { fs.unlinkSync(tmpImg); } catch {}
+      } catch (e) {
+        // 压缩失败不阻塞，继续用原图
+      }
     }
     return { url: `data:image/${mime};base64,${data.toString("base64")}`, type: "base64", size };
   } catch (e) {
