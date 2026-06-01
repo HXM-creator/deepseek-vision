@@ -28,6 +28,7 @@
  *   --budget           显示剩余 token 预算
  *   --max-tokens <n>   最大生成长度
  *   --free             优先使用免费额度模型
+ *   --verify           双平台交叉验证，自动比对豆包与千问结果的一致性
  *
  * 示例:
  *   node vision.js photo.jpg                    # auto 模式，智能选择
@@ -35,6 +36,7 @@
  *   node vision.js photo.jpg --mode quality     # 强制高质量
  *   node vision.js photo.jpg --mode ocr         # 文字提取（新版用专用OCR模型）
  *   node vision.js photo.jpg --free             # 优先使用免费额度
+ *   node vision.js photo.jpg --verify           # 识别 + 双平台交叉验证
  *   node vision.js --list                        # 查看所有模型
  *   node vision.js --budget                      # 查看剩余预算
  */
@@ -224,6 +226,7 @@ function parseArgs() {
       case "--list": opts.listModels = true; break;
       case "--budget": opts.showBudget = true; break;
       case "--free": opts.freeFirst = true; break;
+      case "--verify": opts.verify = true; break;
       default:
         if (!args[i].startsWith("--")) {
           if (!opts.imagePath) opts.imagePath = args[i];
@@ -462,7 +465,69 @@ async function main() {
   }
 
   const timing = (Date.now() - startTime) / 1000;
-  printResult(formatResult(data, modelName, provider, timing, selectedMode), opts);
+  const primaryResult = formatResult(data, modelName, provider, timing, selectedMode);
+
+  // ===== --verify: 双平台交叉验证 =====
+  if (opts.verify) {
+    const verifyStart = Date.now();
+    const verifyProv = provider === "ark" ? "dashscope" : "ark";
+    const verifyModels = Object.entries(MODELS).filter(([_, i]) => i.provider === verifyProv);
+    const verifyModel = verifyModels.find(([n]) => n.includes("flash") || n.includes("plus"))?.[0]
+      || verifyModels[0]?.[0];
+
+    if (verifyModel) {
+      if (!opts.json) {
+        console.log(`\n🔍 验证中 (${CONFIG[verifyProv].name} ${verifyModel})...`);
+      }
+
+      try {
+        const verifyData = await callAPI(verifyProv, verifyModel, messages, { ...opts, maxTokens: 256 });
+        const verifyResult = verifyData.choices?.[0]?.message?.content || "";
+
+        // 对比关键实体（人名/作品名等）
+        const primaryText = primaryResult.content || "";
+        const nameMatches = primaryText.match(/[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || [];
+        const chineseMatches = primaryText.match(/[\u4e00-\u9fff]{2,10}(?:·[\u4e00-\u9fff]{2,10})*/g) || [];
+        const allEntities = [...new Set([...nameMatches, ...chineseMatches])].filter(e => e.length > 1);
+
+        const verifyNames = verifyResult.match(/[A-Z][a-z]+(?:\s[A-Z][a-z]+)*/g) || [];
+        const verifyChinese = verifyResult.match(/[\u4e00-\u9fff]{2,10}(?:·[\u4e00-\u9fff]{2,10})*/g) || [];
+        const allVerify = [...new Set([...verifyNames, ...verifyChinese])].filter(e => e.length > 1);
+
+        // 找差异
+        const missing = allEntities.filter(e => !allVerify.some(v => v.includes(e) || e.includes(v)));
+        const extra = allVerify.filter(e => !allEntities.some(v => v.includes(e) || e.includes(v)));
+
+        const verified = missing.length === 0 && extra.length === 0;
+
+        if (opts.json) {
+          primaryResult.verification = {
+            method: "cross-platform",
+            secondary_model: verifyModel,
+            secondary_provider: verifyProv,
+            status: verified ? "confirmed" : "discrepancy",
+            agreement_ratio: verified ? 1.0 : (1 - missing.length / Math.max(allEntities.length, 1)),
+            primary_only_entities: missing,
+            secondary_only_entities: extra,
+            secondary_summary: verifyResult.slice(0, 200)
+          };
+        } else {
+          if (verified) {
+            console.log(`\n✅ 验证通过 — 豆包与千问结果一致，可信度高`);
+          } else {
+            console.log(`\n⚠️ 发现差异 — 两个平台说法不完全一致:`);
+            if (missing.length > 0) console.log(`   主模型独有: ${missing.join(", ")}`);
+            if (extra.length > 0) console.log(`   验证模型独有: ${extra.join(", ")}`);
+            console.log(`   📋 验证模型回答: ${verifyResult.slice(0, 150)}...`);
+          }
+        }
+      } catch (e) {
+        if (!opts.json) console.log(`   ⏭️ 验证跳过 (${e.message.slice(0, 50)})`);
+      }
+    }
+  }
+
+  printResult(primaryResult, opts);
 }
 
 main().catch(e => {
