@@ -7,20 +7,17 @@
   <img src="https://img.shields.io/badge/Qwen-DashScope-00A3FF" alt="Qwen DashScope">
 </p>
 
-<h1 align="center">
-  👁️ DeepSeek Vision
-</h1>
-
+<h1 align="center">👁️ DeepSeek Vision</h1>
 <p align="center">
   <b>Give Your DeepSeek Eyes</b><br>
-  <i>Vision recognition + text fact-checking &mdash; see it, then verify it</i>
+  <i>Vision recognition + fact-checking — see it, then verify it</i>
 </p>
 
 <p align="center">
-  <a href="#-features">Features</a> •
   <a href="#-quick-start">Quick Start</a> •
-  <a href="#-model-selection-guide">Model Guide</a> •
-  <a href="#-getting-api-keys">API Keys</a> •
+  <a href="#-task-presets">Task Presets</a> •
+  <a href="#-dual-verification">Verification</a> •
+  <a href="#-advanced-usage">Advanced</a> •
   <a href="#-benchmark">Benchmark</a> •
   <a href="README.md">🌐 中文</a>
 </p>
@@ -30,327 +27,185 @@
 ## ✨ Features
 
 | Capability | Description |
-|:----------|:------------|
-| 🎌 **Anime Character ID** | Doubao significantly outperforms Qwen (verified by benchmarks) |
-| 🧑‍🔬 **Celebrity & Landmark** | Both platforms accurately identify common celebrities and landmarks |
-| 🗼 **Landmark Recognition** | Doubao more reliable for landmarks like Golden Gate Bridge |
-| 🔬 **Engineering Diagrams** | Chip layouts, circuit schematics, Bode plots, PCB layouts |
-| 🌄 **Scene Understanding** | Detailed image descriptions, object/color/expression detection |
-| 📊 **Chart Extraction** | Bar chart data, curve trends, logic gate analysis |
-| 🎯 **Task Presets `--task`** | Anime/Engineering/OCR/Simple/Scene — one-switch config |
-| 👁️ **Dual Verification `--verify`** | Cross-vision + text fact-checking catches both error types |
-| 💬 **Interactive Mode `--interactive`** | Keep asking follow-ups on the same image, save tokens |
-| 📊 **Usage Tracking `--budget`** | Auto-logs every call, track your token usage |
-| 📝 **Markdown Output `--format`** | Structured output for docs and notes |
-| ⚡ **Turbo Mode** | Doubao fast averages <2s per image |
-| 🌐 **URL Images** | Paste a URL, auto-download and analyze |
-
-## 📁 Project Structure
-
-```
-deepseek-vision/
-│
-├── 🏆 vision.js                  # Main vision script (Node.js, dual-platform)
-├── 🐍 doubao_vision.py           # [Deprecated] Backup script (Python → use vision.js)
-│
-├── 🔑 .env.example               # API key template
-├── 📄 LICENSE                    # MIT License
-│
-├── ⚡ .reasonix/
-│   └── skills/
-│       └── doubao-vision.md      # Reasonix skill config
-│
-├── 🧪 benchmark/
-│   ├── gen_test.py               # Basic shape test generator
-│   ├── gen_eng.py                # Engineering test generator
-│   ├── gen_char.py               # Character/portrait test generator
-│   ├── gen_famous.py             # Celebrity/landmark test generator
-│   └── RESULTS.md                # Full 28-image benchmark report
-│
-└── 📸 benchmark_real/
-    └── README.md                 # Real photo test results
-```
-
-## 🎬 Live Demo
-
-> All outputs below are **real results** from actual runs
-
-### 🎌 Demo 1: Anime Character ID (Doubao)
-
-```bash
-node vision.js anime.jpg "Who is this?" --provider ark
-```
-
-```
-🔥 Volcengine ARK | doubao-seed-1-6-flash-250615
-📝 Mode: auto→balanced | 488KB
-──────────────────────────────────────────────────
-📋 Answer:
-
-This is Shido Itsuka from Date A Live.
-──────────────────────────────────────────────────
-📊 Token: 672  ⏱️  Time: 1.6s
-```
-
-> 💡 Cross-validation shows Doubao is more reliable for anime character recognition.
-
-### 📈 Demo 2: Engineering Chart (Qwen)
-
-```bash
-node vision.js bode_plot.png "What is this?" --free --mode fast
-```
-
-```
-💎 Alibaba DashScope | qwen-vl-plus
-📝 Mode: fast | 8KB
-──────────────────────────────────────────────────
-📋 Answer:
-
-This is a Bode plot of a low-pass filter.
-Cutoff frequency fc = 10 Hz, roll-off -20 dB/decade...
-──────────────────────────────────────────────────
-📊 Token: 941  ⏱️  Time: 6.7s
-```
-
-### ⚡ Demo 3: Quick Scene Understanding (Doubao Turbo)
-
-```bash
-node vision.js scene.png "Describe in one sentence" --provider ark --mode fast
-```
-
-```
-🔥 Volcengine ARK | doubao-1-5-vision-pro-32k-250115
-📝 Mode: fast | 4KB
-──────────────────────────────────────────────────
-📋 Answer:
-
-A simple cartoon showing a red-roofed brown house, a green tree,
-blue sky with white clouds, and a sun over green grass.
-──────────────────────────────────────────────────
-📊 Token: 268  ⏱️  Time: 1.5s
-```
+|:-----------|:------------|
+| 🎌 **Anime Character ID** | Doubao outperforms Qwen (verified) |
+| 🧑‍🔬 **Celebrity/Landmark** | Both platforms accurate |
+| 🔬 **Engineering Diagrams** | Chip/Circuit/Bode/PCB |
+| 🌄 **Scene Understanding** | Detailed image description |
+| 📊 **Chart Extraction** | Bar charts, logic gates |
+| 👁️ **Dual Verification** | Cross-vision + text fact-checking |
+| 🎯 **Task Presets** | One-switch config per scenario |
+| 💬 **Interactive Mode** | Keep asking, save tokens |
+| 📊 **Usage Tracking** | Auto-log every call |
 
 ---
 
 ## 🚀 Quick Start
 
-### 1️⃣ Prerequisites
-
-```
-Node.js 18+   ← for vision.js
-Python 3      ← for doubao_vision.py (optional)
-```
-
-### 2️⃣ Getting API Keys
+### 1️⃣ Get API Keys
 
 <details>
 <summary><b>🔥 Volcengine ARK (Doubao) — Expand</b></summary>
 
-1. Sign up at [Volcengine ARK Console](https://console.volcengine.com/ark)
-2. "ARK Inference" → Create API Key (starts with `ark-`)
-3. "Model Inference" → "Enable Models" → search & enable:
-   - `doubao-seed-1-6-vision-250815` ⭐
-   - `doubao-seed-1-6-flash-250615`
-   - `doubao-1-5-vision-pro-32k-250115`
-4. 💰 Free tier: **50K shared tokens** across all models
+Sign up at [Volcengine ARK](https://console.volcengine.com/ark) → Create API key
+Enable free models: `doubao-seed-1-6-vision-250815` / `doubao-seed-1-6-flash-250615`
+💰 50K shared tokens
 </details>
 
 <details>
 <summary><b>💎 Alibaba DashScope (Qwen) — Expand</b></summary>
 
-1. Sign up at [Alibaba Cloud Bailian](https://bailian.console.aliyun.com/)
-2. "Model Plaza" → "API Key Management" → Create API key
-3. "Model Activation" → search & enable:
-   - `qwen3-vl-plus` ⭐ Daily driver
-   - `qwen-vl-max` High quality
-   - `qwen-vl-ocr-latest` OCR specialist
-   - `qwen3-vl-32b-thinking` Deep reasoning
-   - `qwen3-vl-235b-a22b-thinking` Best quality
-4. 💰 Free tier: **1M tokens per model** (individually counted)
+Sign up at [Alibaba Bailian](https://bailian.console.aliyun.com/) → Create API key
+Enable free models: `qwen3-vl-plus` / `qwen-vl-max` / `qwen-vl-ocr-latest`
+💰 1M tokens per model
 </details>
 
-### 3️⃣ Set Environment Variables
+### 2️⃣ Set Environment
 
 ```bash
-# Windows CMD
-set ARK_API_KEY=ark-your-key-here
-set DASHSCOPE_API_KEY=sk-your-key-here
+# Windows
+set ARK_API_KEY=ark-your-key
+set DASHSCOPE_API_KEY=sk-your-key
 
 # Mac / Linux
-export ARK_API_KEY=ark-your-key-here
-export DASHSCOPE_API_KEY=sk-your-key-here
+export ARK_API_KEY=ark-your-key
+export DASHSCOPE_API_KEY=sk-your-key
 ```
 
-### 4️⃣ One-Click Deploy (for AI assistants)
-
-Give the URL + your API key to any AI, it can deploy in seconds:
+### 3️⃣ Use It
 
 ```bash
-git clone https://github.com/HXM-creator/deepseek-vision.git
-cd deepseek-vision
-export ARK_API_KEY=ark-your-key-here
-export DASHSCOPE_API_KEY=sk-your-key-here
+# Simplest — just ask
 node vision.js image.jpg "What is this?"
+
+# Task preset (recommended)
+node vision.js image.jpg "Who is this?" --task anime
 ```
 
-### 5️⃣ Start Using
+---
+
+## 🎯 Task Presets
+
+No need to remember parameters:
+
+| Scenario | Command | Auto-config |
+|:---------|:--------|:------------|
+| 🎌 **Anime** | `--task anime` | Doubao + verify on |
+| 🔬 **Engineering** | `--task engineering` | Qwen + verify on |
+| 🖼️ **Simple object** | `--task simple` | Fastest, verify off |
+| 📝 **OCR** | `--task ocr` | OCR model |
+| 🌄 **Scene** | `--task scene` | Deep reasoning |
 
 ```bash
-# 🎌 Anime character ID → Doubao (recommended!)
-node vision.js anime.jpg "Who is this?" --provider ark
+# List all presets
+node vision.js --task list
 
-# 🌄 Detailed scene description → Qwen
-node vision.js scene.jpg "Describe in detail" --free
-
-# ⚡ Quick general ID → Doubao turbo
-node vision.js photo.jpg "What is this?" --provider ark --mode fast
-
-# 📋 List all available models
-node vision.js --list
-
-# 🎌 Task presets (auto-configure best params)
-node vision.js anime.jpg "Who is this?" --task anime
-
-# 🔬 Engineering diagram analysis
+# Use a preset
+node vision.js cat.jpg "What breed?" --task simple
 node vision.js circuit.png "Analyze" --task engineering
-
-# 🖼️ Simple object recognition (fastest)
-node vision.js cat.jpg "What cat?" --task simple
-
-# 📝 OCR text extraction
-node vision.js doc.jpg "Extract text" --task ocr
-
-# 🌄 Scene description
-node vision.js scene.jpg "Describe" --task scene
-
-# 🔍 Structured Markdown output
-node vision.js photo.jpg "Analyze" --format markdown
-
-# 💬 Interactive mode (ask follow-ups on same image)
-node vision.js photo.jpg "Who is this?" --interactive
-
-# 📊 View usage stats
-node vision.js --budget
 ```
 
-## 🔍 Dual Verification `--verify`
+---
 
-Vision models make two types of mistakes: **misidentifying** (seeing Golden Gate as Bay Bridge) and **misnaming** (calling Giselle by Winter's name). `--verify` uses two layers to catch both.
+## 👁️ Dual Verification
 
-### Verification Flow
+Vision models make two types of mistakes. `--verify` catches both:
 
 ```
 🖼️ Primary vision → text output
-      ↓
-🔍 Cross-vision → another model re-analyzes → compare → catches "misidentification"
-      ↓
-📖 Text fact-check → verifies names/facts in text → catches "misnaming"
-      ↓
-📋 Combined report
+     ↓
+🔍 Cross-vision → another model → compare → catches misidentification
+     ↓
+📖 Text fact-check → verify facts → catches misnaming
+     ↓
+🎯 Confidence score → ★★★★☆ High confidence
 ```
 
-### Smart Auto-Trigger
-
-`--verify` **auto-decides** based on your question:
-
-| You ask | Behavior |
-|:--------|:---------|
-| "Who is this?" / "What character?" | ✅ Auto-verify (needs precise naming) |
-| "Extract text" / "Read this" | ❌ Skip (OCR, no facts to check) |
-| "What cat?" / "Is this a dog?" | ❌ Skip (simple object, single answer) |
-| "Describe the scene" | ❌ Skip (description only) |
-| "What chip? What values?" | ✅ Auto-verify (values can be wrong) |
-
-Manual control:
-
-```bash
-# Skip auto-verify
-node vision.js image.jpg "Who is this?" --provider ark --no-verify
-
-# Force verify on simple object
-node vision.js image.jpg "What cat?" --provider ark --verify
-```
+Auto-enabled for "Who/What" questions. Skip with `--no-verify`.
 
 ### Cost
 
-| Mode | API Calls | Extra Time | Extra Tokens | Best For |
-|:----|:---------:|:---------:|:-----------:|:--------|
-| Normal | 1 | baseline | baseline | Scene description, features, charts |
-| `--verify` | 2 (primary+verify) | **+2~6s** | **+200~600** | Anime chars, people, landmarks, values |
+| Mode | API Calls | Extra Time | Extra Tokens |
+|:-----|:---------:|:----------:|:------------:|
+| Normal | 1 | baseline | baseline |
+| `--verify` | up to +2 | +3~10s | +400~1200 |
 
 ### Example
 
 ```bash
-# Without verify (fast)
-node vision.js bridge.jpg "What bridge?" --free
-→ Qwen: "San Francisco-Oakland Bay Bridge" (3s)
-
-# With verify (dual verification)
-node vision.js bridge.jpg "What bridge?" --free --verify
-→ Qwen: "San Francisco-Oakland Bay Bridge"
-→ 🔍 Doubao cross-check: "Golden Gate Bridge" ⚠️ Discrepancy
-   ├ Primary only: Bay Bridge, Oakland Bay...
-   └ Cross only: Golden Gate Bridge ✅
-→ 📖 Fact-check: confirmed no text errors
-→ Conclusion: Doubao is correct, it's Golden Gate Bridge
+node vision.js bridge.jpg "What bridge?"
+→ Qwen: "Bay Bridge"
+→ Doubao: "Golden Gate Bridge" ⚠️ mismatch
+→ Fact-check: confirmed
+→ Conclusion: Golden Gate Bridge (Doubao correct)
 ```
 
-JSON mode outputs a `verification` field:
-```json
-{
-  "verification": {
-    "method": "cross-vision + fact-check",
-    "cross_vision": {
-      "match": false,
-      "discrepancies": {
-        "primary_only": ["Bay Bridge"],
-        "cross_only": ["Golden Gate Bridge"]
-      }
-    },
-    "fact_check": {
-      "has_corrections": false,
-      "report": "Confirmed, no errors"
-    }
-  }
-}
+---
+
+## 💬 Interactive Mode
+
+Keep asking about the same image without reloading:
+
+```bash
+node vision.js image.jpg "Who is this?" --interactive
+
+# After result:
+You > Describe their features
+🤖 Blue hair, white shirt, surprised...
+
+You > In Chinese
+🤖 蓝发、白衬衫、惊讶表情...
+
+You > exit
 ```
 
-## 🏆 Model Selection Guide
+---
 
-Based on **28 synthetic images + 10 real photos** cross-validation:
+## 🔧 Advanced Usage
 
-| Scenario | 🥇 Recommendation | Accuracy | Speed |
-|:---------|:-----------------|:-------:|:----:|
-| 🎌 **Anime Character ID** | `--provider ark` | ✅ **100%** | ⚡ 1.7s |
-| 🧑‍🔬 **Celebrity** | Any (Doubao 10x faster) | 🟢 100% | ⚡ 1.3s |
-| 🗼 **Landmarks** | `--provider ark` | 🟢 100% | ⚡ 2~5s |
-| 🎨 **Feature Description** | Any | 🟢 ~100% | 🟡 5~11s |
-| 🔬 **Chip/PCB/Bode** | Any | 🟢 100% | 🟡 5~7s |
-| ⚡ **Circuit Schematics** | `--free` | 🟢 100% | 🟡 7s |
-| 🌄 **Detailed Description** | `--free` (Qwen thinking) | 🟢 100% | 🐢 ~30s |
-| ⚡ **Quick General** | `--provider ark --mode fast` | 🟢 General | ⚡ **<2s** |
-| 🔣 **Logic Gates/Simulink** | ⚠️ Needs human review | 🟡 | — |
+| Feature | Command |
+|:--------|:--------|
+| 📝 **Markdown output** | `--format markdown` |
+| 📊 **Usage stats** | `node vision.js --budget` |
+| 📋 **List models** | `node vision.js --list` |
+| 🔍 **Force verify** | `--verify` |
+| ⏭️ **Skip verify** | `--no-verify` |
+| 🌐 **URL image** | `node vision.js https://... "analyze"` |
+| 🤖 **MCP server** | `node mcp-vision-server.js` |
 
-## 📊 Benchmark Summary
+```bash
+# Structured output for docs
+node vision.js chart.png "What data?" --format markdown
 
-| Metric | Qwen (DashScope) | Doubao (ARK) |
-|:-------|:--------------:|:-----------:|
-| ⏱ Avg latency | 1.3~29.6s | **0.9~7.7s** ⚡ |
-| 📝 Avg tokens | 238~1473 | **208~476** 🏆 |
-| 🎌 Anime ID | ❌ 0% | ✅ **100%** |
-| 🎨 Feature description | 🟢 ~100% | 🟢 ~100% |
-| 🔬 Engineering diagrams | 🟢 ~83% | 🟡 ~67% |
-| 🧑‍🔬 Celebrity/Landmark | 🟢 100% | 🟢 **100%** |
+# Token usage
+node vision.js --budget
+
+# URL image
+node vision.js https://example.com/photo.jpg "What is this?"
+```
+
+---
+
+## 📊 Benchmark
+
+Based on **28 synthetic + 10 real photos** cross-test:
+
+| Scenario | Best Model | Doubao | Qwen |
+|:---------|:----------|:------:|:----:|
+| 🎌 Anime ID | **Doubao** | ✅ | ❌ |
+| 🎨 Features | Any | 🟢 fast | 🟢 detailed |
+| 🧑‍🔬 People/Places | **Doubao** | 🟢 100% | 🟢 100% |
+| 🔬 Chip/PCB | Any | 🟢 | 🟢 |
+| ⚡ Circuit | **Qwen** | 🟡 | 🟢 100% |
+| 🌉 Golden Gate | **Doubao only** | ✅ | ❌ |
 
 > Full report → [`benchmark/RESULTS.md`](benchmark/RESULTS.md)
 
-## 🤖 MCP Protocol Support
+---
 
-This project includes a standard MCP server for any MCP-compatible client (Claude Desktop, Claude Code, etc.).
+## 🤖 MCP Protocol
 
-### Configuration
-
-Add to your MCP client config:
+Compatible with any MCP client (Claude Desktop, etc.):
 
 ```json
 {
@@ -363,49 +218,14 @@ Add to your MCP client config:
 }
 ```
 
-### Available Tools
+## 🔑 API Keys
 
-| Tool | Description |
-|:----|:------------|
-| `vision_analyze` | Analyze an image (supports provider/mode selection) |
-| `vision_list_models` | List all available vision models |
-
-## 🔧 Reasonix Skill Integration
-
-This repo includes a skill config for direct use in Reasonix Code:
-
-```
-/run_skill doubao-vision --arguments "Identify this image"
-```
-
-Skill config → `.reasonix/skills/doubao-vision.md`
-
-## 🔑 About API Keys
-
-**All hardcoded API keys have been removed.** Configure via environment variables:
+**All hardcoded keys removed.** Use environment variables:
 
 | Variable | Platform |
 |:---------|:---------|
 | `ARK_API_KEY` | Volcengine Doubao |
 | `DASHSCOPE_API_KEY` | Alibaba Qwen |
-
-## 🧪 Run Your Own Benchmarks
-
-```bash
-# Generate 28 test images
-python benchmark/gen_test.py
-python benchmark/gen_eng.py
-python benchmark/gen_char.py
-python benchmark/gen_famous.py
-
-# Cross-platform testing
-node vision.js benchmark/01_counting.png "Describe" --free
-node vision.js benchmark/01_counting.png "Describe" --provider ark
-```
-
-## 📄 License
-
-MIT
 
 ---
 
