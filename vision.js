@@ -138,7 +138,7 @@ function showBudget() {
   const arkBudget = 500_000;
   const dsBudget = 1_000_000;
   console.log(`\n📊 用量统计`);
-  console.log(`─".repeat(40)`);
+  console.log("─".repeat(40));
   console.log(`   本月累计: ${b.total.toLocaleString()} tok`);
   console.log(`   今日累计: ${b.dayTotal.toLocaleString()} tok`);
   console.log(`   会话次数: ${b.sessions.length}`);
