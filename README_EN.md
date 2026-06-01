@@ -98,6 +98,8 @@ No need to remember parameters:
 | 🔬 **Engineering** | `--task engineering` | Qwen + verify on |
 | 🖼️ **Simple object** | `--task simple` | Fastest, verify off |
 | 📝 **OCR** | `--task ocr` | OCR model |
+| 📖 **Recognition+Explain** | `--task explain` | Smart explain: anime→lore, landmark→history, engineering→principles |
+| ⚡ **Token Saver** | `--task tiny` | Lowest token usage |
 | 🌄 **Scene** | `--task scene` | Deep reasoning |
 
 ```bash
@@ -129,7 +131,9 @@ Auto-enabled for "Who/What" questions. Skip with `--no-verify`.
 
 ### 🤝 Cross-Platform Disagreement
 
-When Doubao and Qwen disagree, **Doubao's conclusion is preferred by default**. Based on 28-image benchmark testing, Doubao is more accurate for naming tasks (anime characters, people, landmarks).
+When Doubao and Qwen disagree, **Doubao's conclusion is auto-selected with a full re-recognition**. Based on 28-image benchmark testing, Doubao is more accurate for naming tasks (anime characters, people, landmarks).
+
+Images >800KB are **auto-compressed to 1024px** to save ~60% tokens without affecting accuracy. Requires Python PIL.
 
 ```bash
 # Example output
