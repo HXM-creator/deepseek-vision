@@ -44,7 +44,7 @@
 ## 📁 Project Structure
 
 ```
-reasonix-vision/
+deepseek-vision/
 │
 ├── 🏆 vision.js                  # Main vision script (Node.js, dual-platform)
 ├── 🐍 doubao_vision.py           # Backup script (Python, Doubao only)
@@ -217,6 +217,50 @@ Based on **28 synthetic images + 10 real photos** cross-validation:
 | 🧑‍🔬 Celebrity/Landmark | 🟢 100% | 🟢 **100%** |
 
 > Full report → [`benchmark/RESULTS.md`](benchmark/RESULTS.md)
+
+## 🤖 Claude Integration
+
+This project includes an MCP server for direct integration with Claude Desktop or Claude Code.
+
+### Claude Desktop
+
+Add to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "deepseek-vision": {
+      "command": "node",
+      "args": ["/path/to/mcp-vision-server.js"]
+    }
+  }
+}
+```
+
+Restart Claude Desktop. Available tools:
+
+| Tool | Description |
+|:----|:------------|
+| `vision_analyze` | Analyze an image (supports provider/mode selection) |
+| `vision_list_models` | List all available vision models |
+
+### Claude Code
+
+```bash
+claude mcp add deepseek-vision -e "node /path/to/mcp-vision-server.js"
+```
+
+### Example Conversation
+
+```
+You: Who is this anime character?
+Claude: (calls vision_analyze)
+        This is Shido Itsuka from Date A Live.
+
+You: What does this circuit do?
+Claude: (calls vision_analyze)
+        This is an NPN common-emitter amplifier...
+```
 
 ## 🔧 Reasonix Skill Integration
 

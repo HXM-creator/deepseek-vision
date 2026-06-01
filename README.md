@@ -44,7 +44,7 @@
 ## 📁 文件结构
 
 ```
-reasonix-vision/
+deepseek-vision/
 │
 ├── 🏆 vision.js                  # 主力视觉脚本（Node.js，双平台）
 ├── 🐍 doubao_vision.py           # 备用脚本（Python，仅豆包）
@@ -216,6 +216,50 @@ node vision.js --list
 | 🧑‍🔬 名人/地标 | 🟢 100% | 🟢 **100%** |
 
 > 详细报告 → [`benchmark/RESULTS.md`](benchmark/RESULTS.md)
+
+## 🤖 Claude 集成
+
+本项目提供 MCP 服务器，可直接接入 Claude Desktop 或 Claude Code。
+
+### Claude Desktop
+
+在 `claude_desktop_config.json` 中添加：
+
+```json
+{
+  "mcpServers": {
+    "deepseek-vision": {
+      "command": "node",
+      "args": ["你的路径/mcp-vision-server.js"]
+    }
+  }
+}
+```
+
+重启 Claude Desktop 后即可使用以下工具：
+
+| 工具 | 说明 |
+|:----|:----|
+| `vision_analyze` | 分析图片（支持指定 provider/mode） |
+| `vision_list_models` | 查看所有可用模型 |
+
+### Claude Code
+
+```bash
+claude mcp add deepseek-vision -e "node 你的路径/mcp-vision-server.js"
+```
+
+### 示例对话
+
+```
+你: 识别这张图片里的动漫角色
+Claude: （调用 vision_analyze）
+        这是《约会大作战》中的五河士道。
+
+你: 这张电路图是什么原理？
+Claude: （调用 vision_analyze）
+        这是一个 NPN 共射极放大器...
+```
 
 ## 🔧 Reasonix Skill 集成
 
