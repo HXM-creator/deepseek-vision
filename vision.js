@@ -719,15 +719,25 @@ async function main() {
         }
       }
 
-      // 自动切换：当主模型是千问且豆包验证结果不同时，直接采用豆包结论
+      // 自动切换：当主模型是千问且豆包验证结果不同时，用豆包完整重识别
       if (doubaoPreferred && provider !== "ark" && crossText.length > 20) {
-        const oldContent = primaryResult.content;
-        primaryResult.content = `[📌 已自动切换为豆包结论] ${crossText}\n\n---\n⚠️ 原${config.name}结论: ${oldContent.slice(0, 150)}...`;
         if (!opts.json) {
-          console.log(`\n🔄 已自动切换为豆包结论（原${config.name}识别有偏差）`);
+          console.log(`\n🔄 豆包重识别中（原${config.name}识别有偏差）...`);
         }
-        // 同步更新 crossCheck 标记为主模型已被替换
-        primaryResult._switchedToDoubao = true;
+        try {
+          const fullData = await callAPI(crossProv, crossModel, messages, { ...opts, maxTokens: 800 });
+          const fullText = fullData.choices?.[0]?.message?.content || crossText;
+          const oldContent = primaryResult.content;
+          primaryResult.content = `[📌 已自动切换为豆包结论] ${fullText}`;
+          primaryResult.model = crossModel;
+          primaryResult.provider = crossProv;
+          primaryResult._switchedToDoubao = true;
+        } catch (e) {
+          // 重识别失败，用验证阶段的简短结果
+          const oldContent = primaryResult.content;
+          primaryResult.content = `[📌 已自动切换为豆包结论] ${crossText}`;
+          primaryResult._switchedToDoubao = true;
+        }
       }
 
       // 存储交叉验证结果
