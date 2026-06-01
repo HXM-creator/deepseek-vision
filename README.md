@@ -38,9 +38,13 @@
 | 🌄 **场景理解** | 详细描述图片内容，识别物体/颜色/表情 |
 | 📊 **图表提取** | 柱状图数据、曲线图趋势、逻辑门分析 |
 | 🧠 **文本事实核查** | 视觉识别后自动用文本模型核对事实，纠正人名/地名/参数错误 — 解决AI一本正经胡说八道的问题 |
+| 🎯 **场景预设 `--task`** | 动漫/工科/OCR/简单物体/场景，一键切换最佳配置 |
+| 👁️ **双重验证 `--verify`** | 交叉视觉+文本核查，自动发现看走眼和记错名 |
+| 💬 **交互模式 `--interactive`** | 不退出程序，连续追问同一张图，省token |
+| 📊 **用量追踪 `--budget`** | 自动记录每次调用，掌握token消耗 |
+| 📝 **Markdown 输出 `--format`** | 结构化输出，方便嵌入文档和笔记 |
 | ⚡ **极速模式** | Doubao fast 平均 <2 秒/张 |
-| 🔄 **双平台容错** | 一个失败自动切换另一个 |
-| 💰 **完全免费** | 两大平台均有慷慨免费额度 |
+| 🌐 **URL 图片** | 直接传网址自动下载分析 |
 
 ## 📁 文件结构
 
@@ -204,8 +208,29 @@ node vision.js photo.jpg "这是什么？" --provider ark --mode fast
 # 📋 查看所有模型
 node vision.js --list
 
-# 🔍 双平台交叉验证（需要精确命名时推荐）
-node vision.js photo.jpg "这是谁？" --provider ark --verify
+# 🎌 场景预设（自动配置最佳参数）
+node vision.js anime.jpg "这是谁？" --task anime
+
+# 🔬 工科图表分析
+node vision.js circuit.png "分析" --task engineering
+
+# 🖼️ 简单物体识别（最快最省）
+node vision.js cat.jpg "这是什么猫？" --task simple
+
+# 📝 文字提取
+node vision.js doc.jpg "提取文字" --task ocr
+
+# 🌄 详细场景描述
+node vision.js scene.jpg "描述" --task scene
+
+# 🔍 结构化 Markdown 输出
+node vision.js photo.jpg "分析" --format markdown
+
+# 💬 交互式追问（不退出，连续提问同一张图）
+node vision.js photo.jpg "这是谁？" --interactive
+
+# 📊 查看用量统计
+node vision.js --budget
 ```
 
 ## 🔍 双重验证 `--verify`

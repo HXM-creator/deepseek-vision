@@ -30,21 +30,26 @@
  *   --free             优先使用免费额度模型
  *   --verify           事实核查：视觉识别后自动用文本模型核对事实
  *   --no-verify        跳过自动验证（OCR/简单物体识别默认跳过，问"这是谁"时自动开启）
+ *   --task <name>      场景预设：anime / engineering / simple / ocr / scene
+ *   --format markdown  结构化输出（Markdown格式）
+ *   --interactive      交互式追问模式（不退出程序，连续提问）
+ *   --budget           查看用量统计
  *
  * 示例:
  *   node vision.js photo.jpg                    # auto 模式，智能选择
  *   node vision.js photo.jpg "这是什么动物"      # 直接提问
- *   node vision.js photo.jpg --mode quality     # 强制高质量
- *   node vision.js photo.jpg --mode ocr         # 文字提取（新版用专用OCR模型）
- *   node vision.js photo.jpg --free             # 优先使用免费额度
- *   node vision.js photo.jpg --verify           # 识别 + 文本事实核查
- *   node vision.js photo.jpg --no-verify        # 跳过自动验证
+ *   node vision.js photo.jpg --task anime       # 动漫场景预设
+ *   node vision.js photo.jpg --task engineering  # 工科场景预设
+ *   node vision.js photo.jpg --format markdown   # 结构化 Markdown 输出
+ *   node vision.js photo.jpg --interactive       # 交互式追问模式
  *   node vision.js --list                        # 查看所有模型
- *   node vision.js --budget                      # 查看剩余预算
+ *   node vision.js --budget                      # 查看用量统计
  */
 
 const fs = require("fs");
 const path = require("path");
+const readline = require("readline");
+const { execSync } = require("child_process");
 
 // ===================== 配置 =====================
 const CONFIG = {
@@ -96,6 +101,80 @@ const MODELS = {
   "qwen3-vl-8b-instruct":   { provider: "dashscope", quality: 5, speed: 8,  thinking: false, desc: "8B Instruct 轻量快速" },
   "qwen3-vl-flash-2026-01-22":{ provider: "dashscope", quality: 6, speed: 9, thinking: false, desc: "Flash 2026年1月版" },
 };
+
+// ===================== 场景预设 =====================
+const TASK_PRESETS = {
+  anime: { label: "🎌 动漫", provider: "ark", mode: "balanced", verify: true, desc: "动漫角色识别，最佳效果" },
+  engineering: { label: "🔬 工科", provider: "auto", mode: "balanced", verify: true, desc: "芯片/电路/图表分析" },
+  simple: { label: "🖼️ 简单", provider: "ark", mode: "fast", verify: false, desc: "单一物体识别（猫/狗/花）" },
+  ocr: { label: "📝 OCR", provider: "auto", mode: "ocr", verify: false, desc: "文字提取" },
+  scene: { label: "🌄 场景", provider: "dashscope", mode: "thinking", verify: false, desc: "详细场景描述" },
+};
+
+// ===================== 预算追踪 =====================
+const BUDGET_FILE = path.join(__dirname, ".vision_budget.json");
+function loadBudget() {
+  try { return JSON.parse(fs.readFileSync(BUDGET_FILE, "utf8")); }
+  catch { return { total: 0, sessions: [], day: new Date().toISOString().slice(0,10), dayTotal: 0 }; }
+}
+function saveBudget(b) {
+  fs.writeFileSync(BUDGET_FILE, JSON.stringify(b, null, 2));
+}
+function trackTokens(tokens, model, provider) {
+  const b = loadBudget();
+  b.total += tokens;
+  b.dayTotal += tokens;
+  const today = new Date().toISOString().slice(0,10);
+  if (b.day !== today) { b.day = today; b.dayTotal = tokens; }
+  b.sessions.push({ time: new Date().toISOString(), tokens, model, provider });
+  if (b.sessions.length > 1000) b.sessions = b.sessions.slice(-500);
+  saveBudget(b);
+}
+function showBudget() {
+  const b = loadBudget();
+  const today = new Date().toISOString().slice(0,10);
+  if (b.day !== today) { b.day = today; b.dayTotal = 0; }
+  const arkBudget = 500_000;
+  const dsBudget = 1_000_000;
+  console.log(`\n📊 用量统计`);
+  console.log(`─".repeat(40)`);
+  console.log(`   本月累计: ${b.total.toLocaleString()} tok`);
+  console.log(`   今日累计: ${b.dayTotal.toLocaleString()} tok`);
+  console.log(`   会话次数: ${b.sessions.length}`);
+  console.log(`\n💰 剩余额度（预估）`);
+  console.log(`   🔥 豆包: ${(arkBudget - b.total).toLocaleString()} / ${arkBudget.toLocaleString()} tok`);
+  console.log(`   💎 千问: ${(dsBudget - b.total).toLocaleString()} / ${dsBudget.toLocaleString()} tok`);
+  if (b.sessions.length > 0) {
+    console.log(`\n📋 最近5次调用:`);
+    b.sessions.slice(-5).forEach(s => {
+      console.log(`   ${s.time.slice(5,16)} | ${(s.tokens+'').padStart(5)} tok | ${s.model.slice(0,25)}`);
+    });
+  }
+}
+
+// ===================== 置信度评分 =====================
+function computeConfidence(result) {
+  const v = result.verification;
+  if (!v) return { score: 3, label: "未验证", stars: "★★★☆☆" };
+  const cv = v.cross_vision;
+  const fc = v.fact_check;
+
+  let score = 3;
+  const reasons = [];
+
+  // 交叉视觉
+  if (cv?.match === true) { score += 1; reasons.push("双模型一致"); }
+  else if (cv?.match === false) { score -= 1; reasons.push("模型有分歧"); }
+
+  // 事实核查
+  if (fc?.has_corrections === false) { score += 1; reasons.push("事实核查通过"); }
+  else if (fc?.has_corrections === true) { score -= 1; reasons.push("发现事实错误"); }
+
+  score = Math.max(1, Math.min(5, score));
+  const stars = "★".repeat(score) + "☆".repeat(5 - score);
+  const labels = { 1: "低可信度", 2: "需谨慎", 3: "中等", 4: "较可信", 5: "高可信度" };
+  return { score, label: labels[score], stars, reasons };
+}
 
 // ===================== 关键词检测 =====================
 // 用于 auto 模式智能判断
@@ -216,7 +295,17 @@ function parseArgs() {
   const opts = {
     imagePath: null, mode: "auto", prompt: null, provider: "auto",
     model: null, json: false, listModels: false, maxTokens: null, showBudget: false,
-    freeFirst: false,
+    freeFirst: false, format: null, interactive: false,
+  };
+
+  // 列出可用场景预设
+  const listTasks = () => {
+    console.log("\n📋 可用场景预设:\n");
+    for (const [k, v] of Object.entries(TASK_PRESETS)) {
+      console.log(`   ${v.label} --task ${k.padEnd(14)} ${v.desc}`);
+    }
+    console.log(`   🎯 自定义 --task custom        手动指定所有参数`);
+    process.exit(0);
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -225,7 +314,23 @@ function parseArgs() {
       case "--prompt": opts.prompt = args[++i]; break;
       case "--provider": opts.provider = args[++i] || "auto"; break;
       case "--model": opts.model = args[++i]; break;
+      case "--task": {
+        const t = args[++i] || "";
+        if (t === "list") { listTasks(); }
+        const preset = TASK_PRESETS[t];
+        if (preset) {
+          if (!opts.provider || opts.provider === "auto") opts.provider = preset.provider;
+          if (!opts.mode || opts.mode === "auto") opts.mode = preset.mode;
+          if (preset.verify) opts.verify = true;
+        } else {
+          console.error(`❌ 未知场景: ${t}，可用: ${Object.keys(TASK_PRESETS).join(", ")}`);
+          process.exit(1);
+        }
+        break;
+      }
       case "--json": opts.json = true; break;
+      case "--format": opts.format = args[++i] || null; break;
+      case "--interactive": opts.interactive = true; break;
       case "--max-tokens": opts.maxTokens = parseInt(args[++i]) || null; break;
       case "--list": opts.listModels = true; break;
       case "--budget": opts.showBudget = true; break;
@@ -323,7 +428,20 @@ function getDefaultPrompt(mode, userPrompt) {
 }
 
 async function encodeImage(imagePath) {
-  if (/^https?:\/\//.test(imagePath)) return { url: imagePath, type: "url", size: null };
+  // URL 自动下载增强
+  if (/^https?:\/\//.test(imagePath)) {
+    try {
+      const resp = await fetch(imagePath);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const buf = Buffer.from(await resp.arrayBuffer());
+      const mime = resp.headers.get("content-type")?.split("/")?.[1] || "png";
+      const size = buf.length;
+      console.log(`   📥 已下载图片 (${(size/1024).toFixed(0)}KB) 来自 URL`);
+      return { url: imagePath, type: "url", size, _buf: buf, _mime: mime };
+    } catch (e) {
+      throw new Error(`无法下载图片: ${imagePath}\n${e.message}`);
+    }
+  }
   try {
     const data = fs.readFileSync(imagePath);
     const ext = path.extname(imagePath).toLowerCase().slice(1) || "png";
@@ -373,24 +491,15 @@ function formatResult(data, modelName, provider, timing, selectedMode) {
   };
 }
 
-function showBudget() {
-  console.log("\n📊 Vision Pro Token 预算\n");
-  const freeModels = Object.values(MODELS).filter(i => i.provider === "dashscope").length;
-  console.log(`  💎 千问免费模型: ${freeModels} 个，各 100万 token，到期 2026/08/25`);
-  console.log(`     👉 全部免费，优先使用！`);
-  console.log(`  🔥 豆包预算:     ${CONFIG.ark.budget.toLocaleString()} token（共享池）`);
-  console.log(`\n  预估可用总调用次数（每次 ~100 tok）：`);
-  console.log(`     💎 千问: 约 ${(freeModels * CONFIG.dashscope.budget / 100).toLocaleString()} 次（免费）`);
-  console.log(`     🔥 豆包: 约 ${(CONFIG.ark.budget / 100).toLocaleString()} 次`);
-  console.log("\n  省token技巧：");
-  console.log("  • 小图片 + 简单问题 ≈ 40 tok/次 → 优先用 qwen-vl-plus");
-  console.log("  • 大图片 + 详细分析 ≈ 800 tok/次 → 用 qwen3-vl-plus 或 qwen-vl-max");
-  console.log("  • OCR 提取 → 免费专用模型 qwen-vl-ocr-latest");
-  console.log("  • 需要精确命名（动漫/人名）时用 doubao-flash");
-  console.log("  • 日常 auto 模式自动优先选免费模型\n");
-}
+/* showBudget moved to budget tracking section */
 
 function printResult(result, opts) {
+  // 追踪用量
+  if (result.usage?.total) {
+    trackTokens(result.usage.total, result.model, result.provider);
+  }
+
+  // JSON 模式
   if (opts.json) {
     console.log(JSON.stringify(result, null, 2));
     return;
@@ -398,8 +507,31 @@ function printResult(result, opts) {
 
   const config = result.provider === "ark" ? CONFIG.ark : CONFIG.dashscope;
 
+  // 置信度评分
+  const conf = computeConfidence(result);
+
+  // 结构化输出 --format
+  if (opts.format === "markdown") {
+    console.log(`\n## 🤖 识别结果\n`);
+    console.log(`${result.content}\n`);
+    console.log(`> **模型**: ${config.name} | ${result.model}`);
+    console.log(`> **耗时**: ${result.timing} | **Token**: ${result.usage?.total || "?"}`);
+    if (conf) console.log(`> **置信度**: ${conf.stars} ${conf.label}`);
+    if (result.verification) {
+      if (result.verification.cross_vision) {
+        console.log(`> **交叉验证**: ${result.verification.cross_vision.match ? "✅ 一致" : "⚠️ 有分歧"}`);
+      }
+      if (result.verification.fact_check?.has_corrections) {
+        console.log(`> **事实核查**: ⚠️ 发现错误`);
+      }
+    }
+    return;
+  }
+
+  // 普通模式
   console.log(`\n${config.icon} ${config.name} | ${result.model}`);
   console.log(`📝 模式: ${result.mode || "auto"}`);
+  if (conf) console.log(`🎯 置信度: ${conf.stars} ${conf.label}`);
   if (result.reasoning) {
     console.log(`\n🧠 推理:`);
     console.log(result.reasoning);
@@ -619,6 +751,47 @@ async function main() {
   }
 
   printResult(primaryResult, opts);
+
+  // ===== --interactive: 交互式追问 =====
+  if (opts.interactive && img.url) {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    console.log(`\n💬 交互模式已开启（输入 "exit" 退出，输入 "new" 换图）`);
+
+    const ask = () => {
+      rl.question("\n你 > ", async (q) => {
+        const t = q.trim();
+        if (!t || t === "exit") { rl.close(); return; }
+        if (t === "new") { console.log("  请重新运行命令加载新图片"); rl.close(); return; }
+
+        const followMessages = [{
+          role: "user",
+          content: [
+            { type: "text", text: t },
+            { type: "image_url", image_url: { url: img.url } },
+          ],
+        }];
+
+        // 根据原提问选择合适的模型
+        const followProv = primaryResult.provider || provider;
+        const followModel = primaryResult.model || modelName;
+
+        try {
+          const start = Date.now();
+          const data = await callAPI(followProv, followModel, followMessages, { ...opts, maxTokens: 512 });
+          const answer = data.choices?.[0]?.message?.content || "（无回答）";
+          const tok = data.usage?.total_tokens || 0;
+          trackTokens(tok, followModel, followProv);
+          console.log(`\n🤖 ${answer}\n`);
+          console.log(`📊 +${tok} tok`);
+        } catch (e) {
+          console.log(`\n❌ ${e.message.slice(0, 100)}`);
+        }
+
+        ask();
+      });
+    };
+    ask();
+  }
 }
 
 main().catch(e => {

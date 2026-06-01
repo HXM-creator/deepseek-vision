@@ -37,10 +37,13 @@
 | 🔬 **Engineering Diagrams** | Chip layouts, circuit schematics, Bode plots, PCB layouts |
 | 🌄 **Scene Understanding** | Detailed image descriptions, object/color/expression detection |
 | 📊 **Chart Extraction** | Bar chart data, curve trends, logic gate analysis |
-| 🧠 **Text Fact-Checking** | Vision output verified by text model — catches wrong names, places, and values |
+| 🎯 **Task Presets `--task`** | Anime/Engineering/OCR/Simple/Scene — one-switch config |
+| 👁️ **Dual Verification `--verify`** | Cross-vision + text fact-checking catches both error types |
+| 💬 **Interactive Mode `--interactive`** | Keep asking follow-ups on the same image, save tokens |
+| 📊 **Usage Tracking `--budget`** | Auto-logs every call, track your token usage |
+| 📝 **Markdown Output `--format`** | Structured output for docs and notes |
 | ⚡ **Turbo Mode** | Doubao fast averages <2s per image |
-| 🔄 **Dual-Platform Failover** | One fails, the other auto-takes over |
-| 💰 **Fully Free** | Both platforms offer generous free tiers |
+| 🌐 **URL Images** | Paste a URL, auto-download and analyze |
 
 ## 📁 Project Structure
 
@@ -205,8 +208,29 @@ node vision.js photo.jpg "What is this?" --provider ark --mode fast
 # 📋 List all available models
 node vision.js --list
 
-# 🔍 Cross-platform verification (recommended for precise naming)
-node vision.js photo.jpg "Who is this?" --provider ark --verify
+# 🎌 Task presets (auto-configure best params)
+node vision.js anime.jpg "Who is this?" --task anime
+
+# 🔬 Engineering diagram analysis
+node vision.js circuit.png "Analyze" --task engineering
+
+# 🖼️ Simple object recognition (fastest)
+node vision.js cat.jpg "What cat?" --task simple
+
+# 📝 OCR text extraction
+node vision.js doc.jpg "Extract text" --task ocr
+
+# 🌄 Scene description
+node vision.js scene.jpg "Describe" --task scene
+
+# 🔍 Structured Markdown output
+node vision.js photo.jpg "Analyze" --format markdown
+
+# 💬 Interactive mode (ask follow-ups on same image)
+node vision.js photo.jpg "Who is this?" --interactive
+
+# 📊 View usage stats
+node vision.js --budget
 ```
 
 ## 🔍 Dual Verification `--verify`
