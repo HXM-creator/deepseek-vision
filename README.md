@@ -12,8 +12,8 @@
 </h1>
 
 <p align="center">
-  <b>给你的 AI 装上眼睛</b><br>
-  <i>通用视觉识别工具包 — DeepSeek / Claude / 命令行 均可使用 支持豆包 + 千问 双平台</i>
+  <b>给你的 DeepSeek 装上眼睛</b><br>
+  <i>支持豆包 + 千问 双平台视觉识别</i>
 </p>
 
 <p align="center">
@@ -317,6 +317,6 @@ MIT
 ---
 
 <p align="center">
-  <b>DeepSeek Vision — 让你的 AI 拥有眼睛</b><br>
+  <b>DeepSeek Vision — 给你的 DeepSeek 装上眼睛</b><br>
   <a href="README_EN.md">🌐 English Version</a>
 </p>

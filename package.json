@@ -1,7 +1,7 @@
 {
   "name": "deepseek-vision",
   "version": "1.0.0",
-  "description": "Give your AI eyes 👁️ — Universal vision toolkit for DeepSeek / Claude / CLI (Doubao + Qwen)",
+  "description": "Give your DeepSeek eyes 👁️ — Vision toolkit with Doubao + Qwen support",
   "main": "vision.js",
   "scripts": {
     "analyze": "node vision.js",

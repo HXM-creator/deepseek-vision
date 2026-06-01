@@ -12,8 +12,8 @@
 </h1>
 
 <p align="center">
-  <b>Give Your AI Eyes</b><br>
-  <i>Universal vision toolkit — works with DeepSeek / Claude / CLI — Doubao + Qwen dual-platform</i>
+  <b>Give Your DeepSeek Eyes</b><br>
+  <i>Vision toolkit with Doubao + Qwen dual-platform support</i>
 </p>
 
 <p align="center">
@@ -318,6 +318,6 @@ MIT
 ---
 
 <p align="center">
-  <b>DeepSeek Vision — Give Your AI Eyes</b><br>
+  <b>DeepSeek Vision — Give Your DeepSeek Eyes</b><br>
   <a href="README.md">🌐 中文版本</a>
 </p>
