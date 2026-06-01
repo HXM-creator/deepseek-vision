@@ -12,9 +12,11 @@ node_modules/
 # Python
 __pycache__/
 *.pyc
+doubao_vision.py
 
 # 测试生成的图片（保留脚本，图片可重新生成）
 benchmark/*.png
+!benchmark/demo.png
 benchmark/test_*.jpg
 benchmark_real/*.jpg
 benchmark_real/*.png

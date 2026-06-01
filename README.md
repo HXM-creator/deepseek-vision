@@ -40,6 +40,10 @@
 
 ---
 
+<p align="center">
+  <img src="benchmark/demo.png" alt="终端演示" width="85%">
+</p>
+
 ## 🚀 快速开始
 
 ### 1️⃣ 获取 API Key

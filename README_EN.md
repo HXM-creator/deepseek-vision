@@ -40,6 +40,10 @@
 
 ---
 
+<p align="center">
+  <img src="benchmark/demo.png" alt="Terminal Demo" width="85%">
+</p>
+
 ## 🚀 Quick Start
 
 ### 1️⃣ Get API Keys
