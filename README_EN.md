@@ -225,16 +225,26 @@ Vision models make two types of mistakes: **misidentifying** (seeing Golden Gate
 📋 Combined report
 ```
 
-### Auto-Trigger
+### Smart Auto-Trigger
 
-When asking "Who/What" questions, **`--verify` auto-enables**. Use `--no-verify` to skip:
+`--verify` **auto-decides** based on your question:
+
+| You ask | Behavior |
+|:--------|:---------|
+| "Who is this?" / "What character?" | ✅ Auto-verify (needs precise naming) |
+| "Extract text" / "Read this" | ❌ Skip (OCR, no facts to check) |
+| "What cat?" / "Is this a dog?" | ❌ Skip (simple object, single answer) |
+| "Describe the scene" | ❌ Skip (description only) |
+| "What chip? What values?" | ✅ Auto-verify (values can be wrong) |
+
+Manual control:
 
 ```bash
-# Auto dual verification
-node vision.js image.jpg "Who is this?" --provider ark
-
-# Skip verification
+# Skip auto-verify
 node vision.js image.jpg "Who is this?" --provider ark --no-verify
+
+# Force verify on simple object
+node vision.js image.jpg "What cat?" --provider ark --verify
 ```
 
 ### Cost
