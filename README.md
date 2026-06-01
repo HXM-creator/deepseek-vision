@@ -41,12 +41,56 @@
 
 ### 2. 获取 API Key
 
-你需要至少一个平台的 API Key：
+你需要至少一个平台的 API Key（推荐两个都开通，自动容错）。
 
-| 平台 | 获取地址 | 免费额度 |
-|:----|:--------|:--------|
-| 🔥 火山引擎 ARK（豆包） | [console.volcengine.com/ark](https://console.volcengine.com/ark) | 50万 token |
-| 💎 阿里云百炼 DashScope（千问） | [bailian.console.aliyun.com](https://bailian.console.aliyun.com/) | 每模型100万 token |
+#### 🔥 火山引擎 ARK（豆包）
+
+1. 注册 [火山引擎](https://console.volcengine.com/ark) 并登录
+2. 在「ARK 推理」中创建 API Key，复制以 `ark-` 开头的 key
+3. （可选）开通模型：进入「模型推理」→「开通模型」，搜索并开通以下免费视觉模型：
+   - `doubao-seed-1-6-vision-250815` ⭐
+   - `doubao-seed-1-6-flash-250615`
+   - `doubao-1-5-vision-pro-32k-250115`
+4. 免费额度：所有模型**共享 50 万 token**
+
+#### 💎 阿里云百炼 DashScope（千问）
+
+1. 注册 [阿里云百炼](https://bailian.console.aliyun.com/) 并登录
+2. 进入「模型广场」→「API Key 管理」→ 创建 API Key
+3. 在「模型开通」中搜索并开通以下**免费视觉模型**（每个独立 100 万 token）：
+   - `qwen3-vl-plus` ⭐ — **日常首选，免费**
+   - `qwen-vl-plus` / `qwen-vl-plus-latest` — 极速免费
+   - `qwen-vl-max` — 高质量免费
+   - `qwen-vl-ocr-latest` — OCR 专用免费
+   - `qwen3-vl-32b-thinking` — 深度推理免费
+   - `qwen3-vl-235b-a22b-thinking` — 最强免费
+4. 免费额度：**每个模型独立 100 万 token**（到 2026/08/25）
+
+> 💡 千问的免费模型更多且额度独立，建议优先开通。
+
+### 📋 免费视觉模型清单
+
+#### 豆包（ARK 平台，共享 50 万 token）
+
+| 模型 | 质量 | 速度 | 特性 |
+|:----|:---:|:---:|:----|
+| `doubao-seed-1-6-vision-250815` | ⭐⭐⭐ | 🐢 | 最强视觉，深度推理 |
+| `doubao-seed-1-6-flash-250615` | ⭐⭐⭐ | ⚡ | 快速+推理，**首选均衡** |
+| `doubao-1-5-vision-pro-32k-250115` | ⭐⭐ | ⚡⚡ | 最省token，快速 |
+
+#### 千问（DashScope 平台，每模型 100 万 token，独立计算）
+
+| 模型 | 质量 | 速度 | 特性 |
+|:----|:---:|:---:|:----|
+| `qwen3-vl-plus` | ⭐⭐⭐ | ⚡⚡ | **日常首选**，均衡型 |
+| `qwen-vl-plus` | ⭐⭐ | ⚡⚡⚡ | 极速，最省token |
+| `qwen-vl-max` | ⭐⭐⭐ | 🐢 | 高质量，详情分析 |
+| `qwen3-vl-32b-thinking` | ⭐⭐⭐ | 🐢 | 深度思考带推理链 |
+| `qwen3-vl-235b-a22b-thinking` | ⭐⭐⭐⭐ | 🐌 | **最强**，极限分析 |
+| `qwen-vl-ocr-latest` | ⭐⭐⭐ | ⚡ | OCR 文字提取专用 |
+| `qwen3-vl-flash` | ⭐⭐ | ⚡⚡ | 轻量快速 |
+
+> 查看完整列表：`node vision.js --list`
 
 ### 3. 配置环境变量
 

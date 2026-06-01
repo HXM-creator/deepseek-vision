@@ -30,7 +30,29 @@ node vision.js photo.jpg "详细描述" --free
 
 - Node.js 18+（vision.js）
 - Python 3（doubao_vision.py）
-- 至少一个 API Key（豆包或千问）
+- 至少一个 API Key
+
+## API Key 获取
+
+| 平台 | 注册地址 | 免费额度 |
+|:----|:--------|:--------|
+| 🔥 **火山引擎 ARK（豆包）** | console.volcengine.com/ark | 50万 token（共享） |
+| 💎 **阿里云百炼 DashScope（千问）** | bailian.console.aliyun.com | 每模型100万 token（独立） |
+
+## 免费视觉模型
+
+### 豆包（ARK，共享50万token）
+- `doubao-seed-1-6-vision-250815` — 最强视觉
+- `doubao-seed-1-6-flash-250615` — 快速+推理 ⭐推荐
+- `doubao-1-5-vision-pro-32k-250115` — 最省token
+
+### 千问（DashScope，每模型100万token）
+- `qwen3-vl-plus` — 日常首选 ⭐
+- `qwen-vl-plus` — 极速
+- `qwen-vl-max` — 高质量
+- `qwen3-vl-32b-thinking` — 深度思考
+- `qwen-vl-ocr-latest` — OCR专用
+- `qwen3-vl-235b-a22b-thinking` — 最强
 
 ## 更多信息
 
