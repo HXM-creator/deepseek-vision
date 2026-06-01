@@ -34,11 +34,9 @@ node vision.js photo.jpg "详细描述" --free
 node mcp-vision-server.js
 ```
 
-## Claude 集成
+## MCP 协议接入
 
-### Claude Desktop
-
-`claude_desktop_config.json`：
+支持任何 MCP 兼容客户端。MCP 客户端配置：
 ```json
 {
   "mcpServers": {
@@ -48,11 +46,6 @@ node mcp-vision-server.js
     }
   }
 }
-```
-
-### Claude Code
-```bash
-claude mcp add deepseek-vision -e "node 路径/mcp-vision-server.js"
 ```
 
 ## 前提条件

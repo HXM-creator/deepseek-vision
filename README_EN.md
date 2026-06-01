@@ -234,13 +234,13 @@ Based on **28 synthetic images + 10 real photos** cross-validation:
 
 > Full report → [`benchmark/RESULTS.md`](benchmark/RESULTS.md)
 
-## 🤖 Claude Integration
+## 🤖 MCP Protocol Support
 
-This project includes an MCP server for direct integration with Claude Desktop or Claude Code.
+This project includes a standard MCP server for any MCP-compatible client (Claude Desktop, Claude Code, etc.).
 
-### Claude Desktop
+### Configuration
 
-Add to your `claude_desktop_config.json`:
+Add to your MCP client config:
 
 ```json
 {
@@ -253,30 +253,12 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-Restart Claude Desktop. Available tools:
+### Available Tools
 
 | Tool | Description |
 |:----|:------------|
 | `vision_analyze` | Analyze an image (supports provider/mode selection) |
 | `vision_list_models` | List all available vision models |
-
-### Claude Code
-
-```bash
-claude mcp add deepseek-vision -e "node /path/to/mcp-vision-server.js"
-```
-
-### Example Conversation
-
-```
-You: Who is this anime character?
-Claude: (calls vision_analyze)
-        This is Shido Itsuka from Date A Live.
-
-You: What does this circuit do?
-Claude: (calls vision_analyze)
-        This is an NPN common-emitter amplifier...
-```
 
 ## 🔧 Reasonix Skill Integration
 

@@ -233,13 +233,13 @@ node vision.js --list
 
 > 详细报告 → [`benchmark/RESULTS.md`](benchmark/RESULTS.md)
 
-## 🤖 Claude 集成
+## 🤖 MCP 协议接入
 
-本项目提供 MCP 服务器，可直接接入 Claude Desktop 或 Claude Code。
+本项目提供标准 MCP 服务器，可接入任何支持 MCP 协议的客户端（如 Claude Desktop、Claude Code 等）。
 
-### Claude Desktop
+### 配置方式
 
-在 `claude_desktop_config.json` 中添加：
+在 MCP 客户端配置中添加：
 
 ```json
 {
@@ -252,30 +252,12 @@ node vision.js --list
 }
 ```
 
-重启 Claude Desktop 后即可使用以下工具：
+### 可用工具
 
 | 工具 | 说明 |
 |:----|:----|
 | `vision_analyze` | 分析图片（支持指定 provider/mode） |
 | `vision_list_models` | 查看所有可用模型 |
-
-### Claude Code
-
-```bash
-claude mcp add deepseek-vision -e "node 你的路径/mcp-vision-server.js"
-```
-
-### 示例对话
-
-```
-你: 识别这张图片里的动漫角色
-Claude: （调用 vision_analyze）
-        这是《约会大作战》中的五河士道。
-
-你: 这张电路图是什么原理？
-Claude: （调用 vision_analyze）
-        这是一个 NPN 共射极放大器...
-```
 
 ## 🔧 Reasonix Skill 集成
 
