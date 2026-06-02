@@ -89,6 +89,8 @@ const MODELS = {
   "doubao-seed-1-6-lite-251015":    { provider: "ark", quality: 6,  speed: 9, thinking: false, desc: "Seed 1.6 Lite 最省token" },
   // ===== 豆包其他文本模型（已确认）=====
   "doubao-1-5-pro-32k-250115":     { provider: "ark", quality: 7,  speed: 7, thinking: false, desc: "1.5 Pro 32k 通用文本" },
+  // ===== 千问视觉模型（你控制台已开通）=====
+  "qvq-max":              { provider: "dashscope", quality: 9, speed: 5,  thinking: true,  desc: "QVQ Max 视觉推理模型" },
   "qwen-vl-plus":         { provider: "dashscope", quality: 7, speed: 10, thinking: false, desc: "千问VL Plus，最快最省token【首选极速】" },
   "qwen3-vl-flash":       { provider: "dashscope", quality: 6, speed: 9,  thinking: false, desc: "千问3 VL Flash" },
   "qwen3-vl-flash-2025-10-15": { provider: "dashscope", quality: 6, speed: 9, thinking: false, desc: "千问3 VL Flash 旧版" },
