@@ -94,15 +94,89 @@ node vision.js 图片.jpg "这是什么？"
 
 ---
 
+### 💡 省token技巧
+
+| 做法 | 节省 | 说明 |
+|:----|:---:|:------|
+| 用 `--task tiny` | ~70% | 快模型+关闭验证，适合大批量 |
+| 自动压缩 >800KB | ~60% | 自动缩到1024px，不影响识别 |
+| 用 `--task simple` | ~50% | 简单物体不需要验证 |
+| 用 `--interactive` | 每次省50% | 同一张图追问不用重复传图 |
+
+### 开销
+
+| 模式 | API调用 | 额外耗时 | 额外Token |
+|:----|:------:|:-------:|:---------:|
+| 普通 | 1次 | 基准 | 基准 |
+| `--verify` | 最多+2次 | +3~10s | +400~1200 |
+
+---
+
+## 💬 交互模式
+
+不退出程序，连续追问同一张图：
+
+```bash
+node vision.js 图片.jpg "这是谁？" --interactive
+
+# 输出结果后进入对话
+你 > 他有什么特征？
+🤖 蓝发、白衬衫、惊讶表情...
+
+你 > 用英文描述
+🤖 Blue hair, white shirt...
+
+你 > exit  ← 退出
+```
+省掉重复传图，token更省。
+
+## 📊 用量追踪
+
+每次调用自动记录token消耗：
+
+```bash
+node vision.js --budget
+```
+
+输出：
+```
+📊 用量统计
+────────────────────────────────────────
+   本月累计: 1,353 tok
+   今日累计: 1,353 tok
+💰 豆包剩余: 498,647 / 500,000 tok
+💎 千问剩余: 998,647 / 1,000,000 tok
+```
+
 ## 🔧 其他功能
 
 | 功能 | 说明 |
 |:----|:------|
-| 📊 **用量追踪** `--budget` | 自动记录每次token消耗 |
-| 🖼️ **自动压缩** | >800KB自动缩到1024px，省60% |
 | 📝 **Markdown输出** `--format markdown` | 结构化输出 |
-| 🌐 **URL图片** | 直接传网址自动下载 |
-| 🤖 **MCP协议** | 支持Claude等客户端 |
+| 🌐 **URL图片** | 直接传网址自动下载分析 |
+| 🤖 **MCP协议** | `node mcp-vision-server.js` |
+| 🔍 **手动验证** | `--verify` / `--no-verify` |
+
+## 🤖 MCP 协议接入
+
+支持任何 MCP 兼容客户端（Claude Desktop 等）：
+
+```json
+{
+  "mcpServers": {
+    "deepseek-vision": {
+      "command": "node",
+      "args": ["路径/mcp-vision-server.js"]
+    }
+  }
+}
+```
+
+## ⚡ Reasonix Skill
+
+```
+/run_skill deepseek-vision --arguments "识别这张图片"
+```
 
 ---
 
@@ -129,12 +203,19 @@ OCR:      qwen-vl-ocr-latest
 
 ---
 
-## 🔑 API Key
+## 🔑 获取 API Key
 
-| 平台 | 注册地址 | 免费额度 |
-|:----|:--------|:--------|
-| 🔥 火山引擎 ARK（豆包） | console.volcengine.com/ark | 50万 token |
-| 💎 阿里云百炼 DashScope（千问） | bailian.console.aliyun.com | 每模型100万 token |
+### 🔥 火山引擎 ARK（豆包）
+1. 注册 [火山引擎](https://console.volcengine.com/ark) 并登录
+2. 「ARK 推理」→ 创建 API Key（以 `ark-` 开头）
+3. 开通免费模型：`doubao-seed-1-6-vision-250815` / `doubao-seed-1-6-flash-250828`
+4. 💰 免费额度：所有模型**共享 50 万 token**
+
+### 💎 阿里云百炼 DashScope（千问）
+1. 注册 [阿里云百炼](https://bailian.console.aliyun.com/) 并登录
+2. 「模型广场」→「API Key 管理」→ 创建 API Key
+3. 开通免费模型：`qwen3-vl-plus` / `qwen-vl-max` / `qwen-vl-ocr-latest`
+4. 💰 免费额度：**每个模型 100 万 token**（独立计算）
 
 ---
 
