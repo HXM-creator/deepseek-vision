@@ -773,7 +773,7 @@ async function main() {
     const textConfig = CONFIG[textProv];
     const TEXT_MODELS = {
       ark: ["doubao-seed-2-0-pro-260215", "doubao-seed-1-8-251228", "doubao-seed-1-6-flash-250828"],
-      dashscope: ["qwen3-vl-plus"]
+      dashscope: ["qwen3.7-plus", "qwen3.6-plus", "qwen-turbo", "qwen3-vl-plus"]
     };
     const textModel = TEXT_MODELS[textProv]?.[0];
 
@@ -864,7 +864,7 @@ async function main() {
   if (opts.task === "explain" && primaryResult.content?.length > 20) {
     const textProv = provider === "ark" ? "dashscope" : "ark";
     const textConfig = CONFIG[textProv];
-    const textModel = textProv === "dashscope" ? "qwen3-vl-plus" : "doubao-seed-2-0-pro-260215";
+    const textModel = textProv === "dashscope" ? "qwen3.7-plus" : "doubao-seed-2-0-pro-260215";
     const visionText = primaryResult.content.slice(0, 600);
 
     // 判断图片类型，选择讲解方向
