@@ -80,6 +80,10 @@ const MODELS = {
   "doubao-seed-2-0-mini-260428":    { provider: "ark", quality: 6,  speed: 9, thinking: true,  desc: "2.0 Mini 轻量文本" },
   "doubao-seed-code-preview-251028": { provider: "ark", quality: 7,  speed: 8, thinking: true, desc: "Code 代码生成" },
   "doubao-seed-2-0-pro-260215":     { provider: "ark", quality: 9,  speed: 5, thinking: true,  desc: "🏆 2.0 Pro 最强文本核查" },
+  "doubao-seed-2-0-lite-260428":    { provider: "ark", quality: 6,  speed: 8, thinking: true,  desc: "2.0 Lite 轻量文本" },
+  "doubao-seed-2-0-code-preview-260215": { provider: "ark", quality: 8, speed: 6, thinking: true, desc: "2.0 Code 代码专用" },
+  "doubao-seed-1-8-251228":         { provider: "ark", quality: 7,  speed: 7, thinking: true,  desc: "1.8 文本均衡型" },
+  "doubao-seed-character-251128":   { provider: "ark", quality: 7,  speed: 7, thinking: true,  desc: "Character 角色对话" },
   // ===== 千问 - 极速视觉模型（<1s）=====
   "qwen3-vl-flash":       { provider: "dashscope", quality: 7, speed: 10, thinking: false, desc: "🚀 最快(0.3s/120tok)日常首选" },
   "qwen-vl-plus":         { provider: "dashscope", quality: 7, speed: 10, thinking: false, desc: "⚡ 极速视觉(0.4s/121tok)" },
