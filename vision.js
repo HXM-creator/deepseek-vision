@@ -75,6 +75,13 @@ const MODELS = {
   "doubao-seed-1-6-250615":         { provider: "ark", quality: 9,  speed: 5, thinking: true,  desc: "Seed 1.6 多模态，高质量带推理" },
   "doubao-seed-1-6-flash-250615":   { provider: "ark", quality: 7,  speed: 8, thinking: true,  desc: "快速版豆包，仍带推理能力【首选均衡】" },
   "doubao-1-5-vision-pro-32k-250115":{ provider: "ark", quality: 6, speed: 9, thinking: false, desc: "最省token的豆包视觉（无推理）" },
+  // ===== 豆包文本模型（用于事实核查/讲解，非视觉）=====
+  "doubao-seed-2-0-pro-250815":   { provider: "ark", quality: 10, speed: 4, thinking: true,  desc: "Seed 2.0 Pro 最强文本，适合事实核查" },
+  "doubao-seed-2-0-lite-250815":  { provider: "ark", quality: 7,  speed: 8, thinking: true,  desc: "Seed 2.0 Lite 轻量文本" },
+  "doubao-seed-1-8-250815":       { provider: "ark", quality: 8,  speed: 6, thinking: true,  desc: "Seed 1.8 文本，均衡型" },
+  "doubao-1-5-pro-32k-250115":    { provider: "ark", quality: 7,  speed: 7, thinking: false, desc: "1.5 Pro 32k 通用文本" },
+  "doubao-lite-128k-250115":      { provider: "ark", quality: 5,  speed: 9, thinking: false, desc: "Lite 128k 长上下文轻量文本" },
+  "doubao-seed-1-6-lite-250615":  { provider: "ark", quality: 6,  speed: 9, thinking: false, desc: "Seed 1.6 Lite 最省token文本" },
   "qwen-vl-plus":         { provider: "dashscope", quality: 7, speed: 10, thinking: false, desc: "千问VL Plus，最快最省token【首选极速】" },
   "qwen3-vl-flash":       { provider: "dashscope", quality: 6, speed: 9,  thinking: false, desc: "千问3 VL Flash" },
   "qwen3-vl-flash-2025-10-15": { provider: "dashscope", quality: 6, speed: 9, thinking: false, desc: "千问3 VL Flash 旧版" },
@@ -756,7 +763,7 @@ async function main() {
     const textProv = crossProv; // 用另一家的文本模型
     const textConfig = CONFIG[textProv];
     const TEXT_MODELS = {
-      ark: ["doubao-seed-1-6-flash-250615"],
+      ark: ["doubao-seed-2-0-pro-250815", "doubao-seed-1-8-250815", "doubao-seed-1-6-flash-250615"],
       dashscope: ["qwen3-vl-plus"]
     };
     const textModel = TEXT_MODELS[textProv]?.[0];
@@ -848,7 +855,7 @@ async function main() {
   if (opts.task === "explain" && primaryResult.content?.length > 20) {
     const textProv = provider === "ark" ? "dashscope" : "ark";
     const textConfig = CONFIG[textProv];
-    const textModel = textProv === "dashscope" ? "qwen3-vl-plus" : "doubao-seed-1-6-flash-250615";
+    const textModel = textProv === "dashscope" ? "qwen3-vl-plus" : "doubao-seed-2-0-pro-250815";
     const visionText = primaryResult.content.slice(0, 600);
 
     // 判断图片类型，选择讲解方向
