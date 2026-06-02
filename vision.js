@@ -71,40 +71,24 @@ const CONFIG = {
 
 // ===================== 模型目录 =====================
 const MODELS = {
+  // ===== 豆包视觉模型（已确认）=====
   "doubao-seed-1-6-vision-250815": { provider: "ark", quality: 10, speed: 3, thinking: true,  desc: "最强豆包视觉，深度推理，token消耗大" },
-  "doubao-seed-1-6-250615":         { provider: "ark", quality: 9,  speed: 5, thinking: true,  desc: "Seed 1.6 多模态，高质量带推理" },
-  "doubao-seed-1-6-flash-250828":   { provider: "ark", quality: 7,  speed: 8, thinking: true,  desc: "快速版豆包，仍带推理能力【首选均衡】" },
+  "doubao-seed-1-6-251015":        { provider: "ark", quality: 9,  speed: 5, thinking: true,  desc: "Seed 1.6 多模态，高质量带推理" },
+  "doubao-seed-1-6-flash-250828":  { provider: "ark", quality: 7,  speed: 8, thinking: true,  desc: "快速版豆包，仍带推理能力【首选均衡】" },
   "doubao-1-5-vision-pro-32k-250115":{ provider: "ark", quality: 6, speed: 9, thinking: false, desc: "最省token的豆包视觉（无推理）" },
-  // ===== 豆包视觉模型续 =====
-  "doubao-1-5-vision-lite-32k-250115":{ provider: "ark", quality: 5, speed: 10, thinking: false, desc: "1.5 Vision Lite 32k 极速轻量视觉" },
-  "doubao-1-5-thinking-vision-pro-32k-250115":{ provider: "ark", quality: 8, speed: 5, thinking: true, desc: "1.5 Thinking Vision Pro 深度推理视觉" },
-  "doubao-vision-lite-32k-250115":    { provider: "ark", quality: 5, speed: 10, thinking: false, desc: "Vision Lite 32k 轻量视觉" },
-  // ===== 豆包Seed系列文本模型（用于事实核查/讲解）=====
-  "doubao-seed-2-0-code-preview-260215":    { provider: "ark", quality: 9,  speed: 5, thinking: true,  desc: "Seed 2.0 Code 代码专用文本" },
+  // ===== 豆包Seed系列文本模型（已确认）=====
+  "doubao-seed-2-0-pro-260215":     { provider: "ark", quality: 10, speed: 4, thinking: true,  desc: "Seed 2.0 Pro 最强文本，适合事实核查" },
+  "doubao-seed-2-0-lite-260428":    { provider: "ark", quality: 7,  speed: 8, thinking: true,  desc: "Seed 2.0 Lite 轻量文本" },
   "doubao-seed-2-0-mini-260428":    { provider: "ark", quality: 7,  speed: 8, thinking: true,  desc: "Seed 2.0 Mini 轻量文本" },
-  "doubao-seed-character-251128":   { provider: "ark", quality: 8,  speed: 6, thinking: true,  desc: "Seed Character 角色对话文本" },
-  "doubao-seed-code-preview-251028":        { provider: "ark", quality: 8,  speed: 6, thinking: true,  desc: "Seed Code 代码生成文本" },
-  "doubao-seed-translation-250915": { provider: "ark", quality: 8,  speed: 6, thinking: true,  desc: "Seed Translation 翻译文本" },
-  "doubao-seed-1-6-thinking-250615":{ provider: "ark", quality: 8,  speed: 5, thinking: true,  desc: "Seed 1.6 Thinking 深度推理文本" },
-  // ===== 豆包1.5系列文本模型 =====
-  "doubao-1-5-pro-256k-250115":     { provider: "ark", quality: 8,  speed: 5, thinking: false, desc: "1.5 Pro 256k 长上下文文本" },
-  "doubao-1-5-thinking-pro-250115": { provider: "ark", quality: 9,  speed: 4, thinking: true,  desc: "1.5 Thinking Pro 深度推理文本" },
-  "doubao-1-5-lite-32k-250115":     { provider: "ark", quality: 5,  speed: 9, thinking: false, desc: "1.5 Lite 32k 最省token文本" },
-  "doubao-1-5-ui-tars-250115":      { provider: "ark", quality: 7,  speed: 6, thinking: false, desc: "1.5 UI-TARS 界面理解文本" },
-  // ===== 豆包通用pro/lite系列文本模型 =====
-  "doubao-pro-4k-250115":           { provider: "ark", quality: 6,  speed: 8, thinking: false, desc: "Pro 4k 通用文本" },
-  "doubao-pro-32k-250115":          { provider: "ark", quality: 7,  speed: 8, thinking: false, desc: "Pro 32k 通用文本" },
-  "doubao-pro-128k-250115":         { provider: "ark", quality: 7,  speed: 6, thinking: false, desc: "Pro 128k 长上下文文本" },
-  "doubao-pro-256k-250115":         { provider: "ark", quality: 7,  speed: 5, thinking: false, desc: "Pro 256k 超长上下文文本" },
-  "doubao-lite-4k-250115":          { provider: "ark", quality: 4,  speed: 10, thinking: false, desc: "Lite 4k 极速轻量文本" },
-  "doubao-lite-32k-250115":         { provider: "ark", quality: 5,  speed: 9, thinking: false, desc: "Lite 32k 轻量文本" },
-  // ===== 豆包文本模型（缩写名称）=====
-  "doubao-seed-2-0-pro-260215":   { provider: "ark", quality: 10, speed: 4, thinking: true,  desc: "Seed 2.0 Pro 最强文本，适合事实核查" },
-  "doubao-seed-2-0-lite-260428":  { provider: "ark", quality: 7,  speed: 8, thinking: true,  desc: "Seed 2.0 Lite 轻量文本" },
-  "doubao-seed-1-8-251228":       { provider: "ark", quality: 8,  speed: 6, thinking: true,  desc: "Seed 1.8 文本，均衡型" },
-  "doubao-1-5-pro-32k-250115":    { provider: "ark", quality: 7,  speed: 7, thinking: false, desc: "1.5 Pro 32k 通用文本" },
-  "doubao-lite-128k-250115":      { provider: "ark", quality: 5,  speed: 9, thinking: false, desc: "Lite 128k 长上下文轻量文本" },
-  "doubao-seed-1-6-lite-251015":  { provider: "ark", quality: 6,  speed: 9, thinking: false, desc: "Seed 1.6 Lite 最省token文本" },
+  "doubao-seed-2-0-code-preview-260215": { provider: "ark", quality: 9, speed: 5, thinking: true, desc: "Seed 2.0 Code 代码专用" },
+  "doubao-seed-1-8-251228":         { provider: "ark", quality: 8,  speed: 6, thinking: true,  desc: "Seed 1.8 文本，均衡型" },
+  "doubao-seed-character-251128":   { provider: "ark", quality: 8,  speed: 6, thinking: true,  desc: "Seed Character 角色对话" },
+  "doubao-seed-code-preview-251028": { provider: "ark", quality: 8,  speed: 6, thinking: true, desc: "Seed Code 代码生成" },
+  "doubao-seed-translation-250915": { provider: "ark", quality: 8,  speed: 6, thinking: true,  desc: "Seed Translation 翻译" },
+  "doubao-seed-1-6-thinking-250615":{ provider: "ark", quality: 8,  speed: 5, thinking: true, desc: "Seed 1.6 Thinking 深度推理" },
+  "doubao-seed-1-6-lite-251015":    { provider: "ark", quality: 6,  speed: 9, thinking: false, desc: "Seed 1.6 Lite 最省token" },
+  // ===== 豆包其他文本模型（已确认）=====
+  "doubao-1-5-pro-32k-250115":     { provider: "ark", quality: 7,  speed: 7, thinking: false, desc: "1.5 Pro 32k 通用文本" },
   "qwen-vl-plus":         { provider: "dashscope", quality: 7, speed: 10, thinking: false, desc: "千问VL Plus，最快最省token【首选极速】" },
   "qwen3-vl-flash":       { provider: "dashscope", quality: 6, speed: 9,  thinking: false, desc: "千问3 VL Flash" },
   "qwen3-vl-flash-2025-10-15": { provider: "dashscope", quality: 6, speed: 9, thinking: false, desc: "千问3 VL Flash 旧版" },
