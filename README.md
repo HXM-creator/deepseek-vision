@@ -3,301 +3,138 @@
   <img src="https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/License-MIT-orange" alt="License">
   <img src="https://img.shields.io/badge/DeepSeek-Vision-8B5CF6" alt="DeepSeek Vision">
-  <img src="https://img.shields.io/badge/Doubao-ARK-FF6B35" alt="Doubao ARK">
-  <img src="https://img.shields.io/badge/Qwen-DashScope-00A3FF" alt="Qwen DashScope">
+  <img src="https://img.shields.io/badge/Models-28-8B5CF6" alt="28 Models">
 </p>
 
 <h1 align="center">👁️ DeepSeek Vision</h1>
 <p align="center">
   <b>给你的 DeepSeek 装上眼睛</b><br>
-  <i>双平台视觉识别 + 事实核查 — 看图识字，文本纠错</i>
+  <i>双平台视觉识别 — 豆包优先 · 双重验证 · 自动省token</i>
 </p>
 
 <p align="center">
   <a href="#-快速开始">快速开始</a> •
+  <a href="#-实测成绩">实测成绩</a> •
   <a href="#-场景预设">场景预设</a> •
   <a href="#-双重验证">双重验证</a> •
-  <a href="#-高级用法">高级用法</a> •
-  <a href="#-基准测试">基准测试</a> •
+  <a href="#-模型清单">模型清单</a> •
   <a href="README_EN.md">🌐 English</a>
 </p>
 
 ---
 
-## ✨ 特性一览
+## ⚡ 30 秒上手
 
-| 能力 | 说明 |
-|:----|:------|
-| 🎌 **动漫角色识别** | 豆包准确率明显优于千问（实测对比） |
-| 🧑‍🔬 **名人/地标识别** | 双平台均能准确识别 |
-| 🔬 **工科图表** | 芯片/电路/Bode图/PCB |
-| 🌄 **场景理解** | 详细描述图片内容 |
-| 📊 **图表提取** | 柱状图数据、逻辑门分析 |
-| 👁️ **双重验证** `--verify` | 交叉视觉+文本核查，发现AI幻觉 |
-| 🎯 **场景预设** `--task` | 一键切换最佳配置 |
-| 💬 **交互模式** `--interactive` | 连续追问同一张图，省token |
-| 📊 **用量追踪** `--budget` | 自动记录token消耗 |
+```bash
+git clone https://github.com/HXM-creator/deepseek-vision.git
+cd deepseek-vision
+set ARK_API_KEY=ark-你的key
+node vision.js 图片.jpg "这是什么？"
+```
 
 ---
 
-<p align="center">
-  <img src="benchmark/demo.png" alt="终端演示" width="85%">
-</p>
+## 📊 实测成绩
 
-## 🚀 快速开始
+> 基于 55 张测试图（28合成 + 10真实 + 9Unsplash + 8自绘）全覆盖测试
 
-### 1️⃣ 获取 API Key
+### 日常场景识别（8张自绘图）
 
-<details>
-<summary><b>🔥 火山引擎 ARK（豆包）— 展开</b></summary>
+| 测试 | 内容 | doubao-1.6-flash | doubao-1.5-vision-pro | qwen3-vl-flash |
+|:----|:----|:--------------:|:-------------------:|:--------------:|
+| 🍜 牛肉面 | 识别为牛肉面 | ✅ | ✅ | — |
+| 🚦 红绿灯 | 识别为红灯 | ✅ | ✅ | — |
+| 🕐 时钟 | 识别为10:30 | ✅ | ✅ | — |
+| 🏁 国旗 | 五星红旗 | ✅ | ✅ | — |
+| 📊 图表 | Thu=150 | ✅ | ✅ | — |
+| 🔋 电路 | 电池+灯泡 | ✅ | ✅ | — |
+| 🍎 水果 | 苹果香蕉葡萄 | ✅ | ❌ | — |
+| 😊 笑脸 | 笑脸表情 | ✅ | ✅ | — |
+| **总分** | | **8/8 🏆** | **7/8** | — |
 
-注册 [火山引擎](https://console.volcengine.com/ark) → 「ARK 推理」→ 创建 API Key
-开通免费模型：`doubao-seed-1-6-vision-250815` / `doubao-seed-1-6-flash-250615`
-💰 50 万共享 token
-</details>
+### 模型速度对比
 
-<details>
-<summary><b>💎 阿里云百炼 DashScope（千问）— 展开</b></summary>
-
-注册 [阿里云百炼](https://bailian.console.aliyun.com/) → 「API Key 管理」→ 创建 Key
-开通免费模型：`qwen3-vl-plus` / `qwen-vl-max` / `qwen-vl-ocr-latest`
-💰 每模型 100 万 token（独立计算）
-</details>
-
-### 2️⃣ 设置环境变量
-
-```bash
-# Windows
-set ARK_API_KEY=ark-你的key
-set DASHSCOPE_API_KEY=sk-你的key
-
-# Mac / Linux
-export ARK_API_KEY=ark-你的key
-export DASHSCOPE_API_KEY=sk-你的key
-```
-
-### 3️⃣ 开始使用
-
-```bash
-# 最简单的用法 — 直接问
-node vision.js 图片.jpg "这是谁？"
-
-# 场景预设（推荐）
-node vision.js 图片.jpg "这是谁？" --task anime
-```
+| 模型 | 平均耗时 | 平均Token | 定位 |
+|:----|:-------:|:---------:|:----|
+| **doubao-1.6-flash** | ~1.3s | ~500 | 🥇 日常首选（最准） |
+| doubao-1.5-vision-pro | **~1.0s** | **~200** | ⚡ 极速识别 |
+| qwen3-vl-flash | **~0.3s** | **~120** | 🚀 最快响应 |
+| doubao-seed-1.6-vision | ~4.8s | ~540 | 🏆 最强豆包 |
+| qwen3-vl-32b-thinking | ~3.0s | ~205 | 🧠 深度推理 |
 
 ---
 
 ## 🎯 场景预设
 
-不用记参数，直接说场景：
-
-| 场景 | 命令 | 自动配置 |
-|:----|:----|:--------|
-| 🎌 **动漫角色** | `--task anime` | 豆包 + 验证开启 |
-| 🔬 **工科电路** | `--task engineering` | 千问 + 验证开启 |
-| 🖼️ **简单物体** | `--task simple` | 最快模型，关闭验证 |
-| ⚡ **极省模式** | `--task tiny` | 最省token，适合大批量/手机 |
-| 📖 **识别+讲解** | `--task explain` | 识别+智能讲解：动漫→作品背景，建筑→历史，工科→原理，食物/动物跳过 |
-| 📝 **文字提取** | `--task ocr` | OCR 专用模型 |
-| 🌄 **详细场景** | `--task scene` | 千问深度推理 |
-
-```bash
-# 查看所有预设
-node vision.js --task list
-
-# 使用预设
-node vision.js cat.jpg "什么品种？" --task simple
-node vision.js circuit.png "分析" --task engineering
-```
+| 场景 | 命令 | 策略 |
+|:----|:----|:------|
+| 🖼️ **日常识物** | 不加参数 | doubao-1.6-flash 优先（8/8全对） |
+| 🔬 **工科分析** | `--task engineering` | 千问，图表更准 |
+| 🎌 **动漫角色** | `--task anime` | 豆包（千问在动漫上0%） |
+| 📖 **识别+讲解** | `--task explain` | 识别后自动生成知识讲解 |
+| 📝 **文字提取** | `--task ocr` | OCR专用模型 |
+| 🖼️ **简单物体** | `--task simple` | 最快模型，不验证 |
+| ⚡ **极省模式** | `--task tiny` | 最省token，适合大批量 |
+| 🌄 **场景描述** | `--task scene` | 千问深度推理 |
+| 💬 **交互追问** | `--interactive` | 连续追问同一张图，省token |
 
 ---
 
 ## 👁️ 双重验证
 
-视觉模型会犯两类错误。`--verify` 用两层验证捕捉它们：
+视觉模型会犯两类错误，`--verify` 自动捕捉：
 
 ```
-🖼️ 主视觉 → 输出文本
-     ↓
-🔍 交叉视觉 → 另一平台再识别 → 比对差异 → 发现"看走眼"
-     ↓
-📖 文本核查 → 检查事实错误 → 发现"记错名"
-     ↓
-🎯 置信度评分 → ★★★★☆ 较可信
+看走眼（金门大桥→海湾大桥） → 🔍 交叉视觉比对
+记错名（Giselle→金旼炡）   → 📖 文本模型核查
+不一致时                    → 🎯 自动采用豆包结论
 ```
 
-问"这是谁？""什么角色？"时**自动开启**，无需手动加参数。想跳过用 `--no-verify`。
+问"这是谁/什么建筑"时自动开启。加 `--no-verify` 跳过。
 
-### 🤝 双平台分歧处理
+---
 
-当千问和豆包的识别结果不一致时，**默认自动采用豆包的结论并切换为豆包完整重识别**。原因：基于 28 张图的基准测试，豆包在命名类识别（动漫角色/人名/地标）上准确率更高。
+## 🔧 其他功能
 
-图片较大（>800KB）时会**自动压缩到最长边 1024px**，在不影响识别精度的前提下节省约 60% token。压缩需要 Python PIL 库支持。
+| 功能 | 说明 |
+|:----|:------|
+| 📊 **用量追踪** `--budget` | 自动记录每次token消耗 |
+| 🖼️ **自动压缩** | >800KB自动缩到1024px，省60% |
+| 📝 **Markdown输出** `--format markdown` | 结构化输出 |
+| 🌐 **URL图片** | 直接传网址自动下载 |
+| 🤖 **MCP协议** | 支持Claude等客户端 |
 
-```bash
-# 输出示例
-⚠️ 存在不一致：
-   主模型独有: 海湾大桥
-   验证模型独有: Golden Gate Bridge
-💡 基于基准测试，豆包在命名类识别上更准确，建议优先采纳豆包的结果。
+---
+
+## 📋 模型清单
+
+**共28个模型**，经42款实测淘汰17个后保留。
+
+### 🔥 豆包 ARK（7个）
+```
+日常首选: doubao-seed-1-6-flash-250828
+极速识别: doubao-1-5-vision-pro-32k-250115
+最强视觉: doubao-seed-1-6-vision-250815
+事实核查: doubao-seed-1-8-251228（性价比最高，320tok）
 ```
 
-### 💡 省 token 技巧
-
-| 做法 | 节省 | 说明 |
-|:----|:---:|:------|
-| 用 `--task tiny` | ~70% | 按快模型+关闭验证，适合大批量 |
-| 先压缩图片到 <1MB | ~60% | 图片越小，编码后 token 越少 |
-| 用 `--task simple` 识物 | ~50% | 简单物体不需要验证 |
-| 用 `--interactive` | 每次省50% | 同一张图追问不用重复传图 |
-| 避免 `--format markdown` | ~10% | markdown 格式比纯文本略长 |
-
-### 开销
-
-| 模式 | API 调用 | 额外耗时 | 额外 token |
-|:----|:-------:|:-------:|:---------:|
-| 普通 | 1 次 | 基准 | 基准 |
-| `--verify` | 最多 +2 次 | +3~10s | +400~1200 |
-
-### 示例
-
-```bash
-# 自动验证
-node vision.js bridge.jpg "这是什么桥？"
-→ Qwen: "海湾大桥"
-→ 豆包: "金门大桥" ⚠️ 不一致
-→ 文本核查: 确认无误
-→ 结论: 金门大桥（豆包正确）
+### 💎 千问 DashScope（21个）
+```
+最快响应: qwen3-vl-flash（0.3s/120tok）
+均衡首选: qwen3-vl-plus
+高质量:   qwen-vl-max
+深度推理: qwen3-vl-32b-thinking
+OCR:      qwen-vl-ocr-latest
 ```
 
 ---
 
-## 💬 交互模式
+## 🔑 API Key
 
-不退出程序，连续追问同一张图：
-
-```bash
-node vision.js 图片.jpg "这是谁？" --interactive
-
-# 输出结果后进入对话
-你 > 他有什么特征？
-🤖 蓝发、白衬衫、惊讶表情...
-
-你 > 用英文描述
-🤖 Blue hair, white shirt...
-
-你 > exit  ← 退出
-```
-
-省掉重复传图，速度更快，token 更省。
-
----
-
-## 📊 用量追踪
-
-每次调用自动记录 token 消耗，随时查看：
-
-```bash
-node vision.js --budget
-```
-
-输出示例：
-
-```
-📊 用量统计
-────────────────────────────────────────
-   本月累计: 1,353 tok
-   今日累计: 1,353 tok
-   会话次数: 2
-
-💰 剩余额度（预估）
-   🔥 豆包: 498,647 / 500,000 tok
-   💎 千问: 998,647 / 1,000,000 tok
-
-📋 最近5次调用:
-   06-01 |   683 tok | doubao-seed-1-6-flash
-   06-01 |   670 tok | doubao-seed-1-6-flash
-```
-
-数据保存在本地 `.vision_budget.json`，不会上传。
-
----
-
-## 🔧 高级用法
-
-| 用法 | 命令 |
-|:----|:----|
-| 📝 **Markdown 输出** | `--format markdown` |
-| 📊 **查看用量** | `node vision.js --budget` |
-| 📋 **所有模型** | `node vision.js --list` |
-| 🔍 **手动验证** | `--verify` |
-| ⏭️ **跳过验证** | `--no-verify` |
-| 🌐 **URL 图片** | `node vision.js https://... "分析"` |
-| 🤖 **MCP 协议** | `node mcp-vision-server.js` |
-
-```bash
-# 结构化输出，适合嵌入文档
-node vision.js chart.png "数据是多少？" --format markdown
-
-# 查看用量统计
-node vision.js --budget
-
-# 直接传 URL
-node vision.js https://example.com/photo.jpg "这是什么？"
-
-# 跳过自动验证
-node vision.js photo.jpg "这是谁？" --no-verify
-```
-
----
-
-## 📊 基准测试
-
-基于 **28 张合成图 + 10 张真实照片** 交叉测试：
-
-| 场景 | 最佳模型 | 豆包 | 千问 |
-|:----|:-------|:---:|:---:|
-| 🎌 动漫身份 | **豆包** | ✅ 唯一正确 | ❌ |
-| 🎨 特征描述 | 任意 | 🟢 简洁快 | 🟢 详细 |
-| 🧑‍🔬 名人/地标 | **豆包** | 🟢 100% | 🟢 100% |
-| 🔬 芯片/PCB | 任意 | 🟢 | 🟢 |
-| ⚡ 电路原理图 | **千问** | 🟡 参数偏差 | 🟢 100% |
-| 🌉 金门大桥 | **豆包独占** | ✅ | ❌ 认错 |
-
-> 详细报告 → [`benchmark/RESULTS.md`](benchmark/RESULTS.md)
-
----
-
-## 🤖 MCP 协议接入
-
-支持任何 MCP 兼容客户端（Claude Desktop 等）：
-
-```json
-{
-  "mcpServers": {
-    "deepseek-vision": {
-      "command": "node",
-      "args": ["路径/mcp-vision-server.js"]
-    }
-  }
-}
-```
-
-## 🔧 Reasonix Skill 集成
-
-```
-/run_skill deepseek-vision --arguments "识别这张图片"
-```
-
-## 🔑 关于 API Key
-
-**所有硬编码 Key 已移除。** 通过环境变量配置：
-
-| 变量 | 平台 |
-|:----|:----|
-| `ARK_API_KEY` | 火山引擎豆包 |
-| `DASHSCOPE_API_KEY` | 阿里云千问 |
+| 平台 | 注册地址 | 免费额度 |
+|:----|:--------|:--------|
+| 🔥 火山引擎 ARK（豆包） | console.volcengine.com/ark | 50万 token |
+| 💎 阿里云百炼 DashScope（千问） | bailian.console.aliyun.com | 每模型100万 token |
 
 ---
 
