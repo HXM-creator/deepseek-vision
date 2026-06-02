@@ -73,17 +73,13 @@ const CONFIG = {
 const MODELS = {
   // ===== 豆包 - 视觉模型（按实测性能排序）=====
   "doubao-1-5-vision-pro-32k-250115":{ provider: "ark", quality: 6, speed: 10, thinking: false, desc: "🚀 最省token最快(1.2s/155tok)" },
-  "doubao-seed-1-6-flash-250828":  { provider: "ark", quality: 7,  speed: 8, thinking: true,  desc: "⚡ 快速均衡(3.3s/519tok)" },
+  "doubao-seed-1-6-flash-250828":  { provider: "ark", quality: 7,  speed: 8, thinking: true,  desc: "⚡ 快速均衡(3.3s/519tok) 动漫最佳" },
   "doubao-seed-1-6-251015":        { provider: "ark", quality: 8,  speed: 6, thinking: true,  desc: "高质量多模态(4.8s/291tok)" },
   "doubao-seed-1-6-vision-250815": { provider: "ark", quality: 9,  speed: 4, thinking: true,  desc: "🏆 最强豆包视觉(4.2s/370tok)" },
-  // ===== 豆包 - 文本模型（支持识图的文本模型，但更适合作事实核查）=====
-  "doubao-seed-2-0-mini-260428":    { provider: "ark", quality: 6,  speed: 9, thinking: true,  desc: "2.0 Mini 轻量文本" },
-  "doubao-seed-code-preview-251028": { provider: "ark", quality: 7,  speed: 8, thinking: true, desc: "Code 代码生成" },
-  "doubao-seed-2-0-pro-260215":     { provider: "ark", quality: 9,  speed: 5, thinking: true,  desc: "🏆 2.0 Pro 最强文本核查" },
-  "doubao-seed-2-0-lite-260428":    { provider: "ark", quality: 6,  speed: 8, thinking: true,  desc: "2.0 Lite 轻量文本" },
-  "doubao-seed-2-0-code-preview-260215": { provider: "ark", quality: 8, speed: 6, thinking: true, desc: "2.0 Code 代码专用" },
-  "doubao-seed-1-8-251228":         { provider: "ark", quality: 7,  speed: 7, thinking: true,  desc: "1.8 文本均衡型" },
-  "doubao-seed-character-251128":   { provider: "ark", quality: 7,  speed: 7, thinking: true,  desc: "Character 角色对话" },
+  // ===== 豆包 - 文本模型（适合作事实核查）=====
+  "doubao-seed-1-8-251228":         { provider: "ark", quality: 7,  speed: 8, thinking: true,  desc: "🏆 性价比最高(320tok) 事实核查首选" },
+  "doubao-seed-2-0-code-preview-260215": { provider: "ark", quality: 7, speed: 8, thinking: true, desc: "最省token(250tok) 快速核查" },
+  "doubao-seed-2-0-pro-260215":     { provider: "ark", quality: 9,  speed: 4, thinking: true,  desc: "最强文本(1600tok) 深度核查" },
   // ===== 千问 - 极速视觉模型（<1s）=====
   "qwen3-vl-flash":       { provider: "dashscope", quality: 7, speed: 10, thinking: false, desc: "🚀 最快(0.3s/120tok)日常首选" },
   "qwen-vl-plus":         { provider: "dashscope", quality: 7, speed: 10, thinking: false, desc: "⚡ 极速视觉(0.4s/121tok)" },
@@ -765,7 +761,7 @@ async function main() {
     const textProv = crossProv; // 用另一家的文本模型
     const textConfig = CONFIG[textProv];
     const TEXT_MODELS = {
-      ark: ["doubao-seed-2-0-pro-260215", "doubao-seed-1-8-251228", "doubao-seed-1-6-flash-250828"],
+      ark: ["doubao-seed-1-8-251228", "doubao-seed-2-0-code-preview-260215", "doubao-seed-2-0-pro-260215"],
       dashscope: ["qwen3.7-plus", "qwen3.6-plus", "qwen-turbo", "qwen3-vl-plus"]
     };
     const textModel = TEXT_MODELS[textProv]?.[0];
@@ -857,7 +853,7 @@ async function main() {
   if (opts.task === "explain" && primaryResult.content?.length > 20) {
     const textProv = provider === "ark" ? "dashscope" : "ark";
     const textConfig = CONFIG[textProv];
-    const textModel = textProv === "dashscope" ? "qwen3.7-plus" : "doubao-seed-2-0-pro-260215";
+    const textModel = textProv === "dashscope" ? "qwen3.7-plus" : "doubao-seed-1-8-251228";
     const visionText = primaryResult.content.slice(0, 600);
 
     // 判断图片类型，选择讲解方向
