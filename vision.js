@@ -91,6 +91,11 @@ const MODELS = {
   "doubao-1-5-pro-32k-250115":     { provider: "ark", quality: 7,  speed: 7, thinking: false, desc: "1.5 Pro 32k 通用文本" },
   // ===== 千问视觉模型（你控制台已开通）=====
   "qvq-max":              { provider: "dashscope", quality: 9, speed: 5,  thinking: true,  desc: "QVQ Max 视觉推理模型" },
+  // ===== 千问多模态模型（支持识图+文本）=====
+  "qwen3.7-plus":         { provider: "dashscope", quality: 9, speed: 7,  thinking: true,  desc: "Qwen3.7 Plus 最新多模态" },
+  "qwen3.6-plus":         { provider: "dashscope", quality: 8, speed: 8,  thinking: true,  desc: "Qwen3.6 Plus 多模态" },
+  "qwen3.6-flash":        { provider: "dashscope", quality: 7, speed: 9,  thinking: false, desc: "Qwen3.6 Flash 快速多模态" },
+  "qwen-turbo":           { provider: "dashscope", quality: 6, speed: 10, thinking: false, desc: "千问Turbo 极速多模态" },
   "qwen-vl-plus":         { provider: "dashscope", quality: 7, speed: 10, thinking: false, desc: "千问VL Plus，最快最省token【首选极速】" },
   "qwen3-vl-flash":       { provider: "dashscope", quality: 6, speed: 9,  thinking: false, desc: "千问3 VL Flash" },
   "qwen3-vl-flash-2025-10-15": { provider: "dashscope", quality: 6, speed: 9, thinking: false, desc: "千问3 VL Flash 旧版" },
